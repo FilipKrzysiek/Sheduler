@@ -10,6 +10,7 @@ void sleep(unsigned milliseconds)
 #else
 
 #include <unistd.h>
+
 unsigned sleep(unsigned int milliseconds) {
     usleep(milliseconds * 1000); // takes microseconds
 }
@@ -37,9 +38,31 @@ public:
 
     virtual ~Sheduler();
 
+    /**
+     * Adding new task to que.
+     * @param interval Interval of calling passed function.
+     * @param execFun Address for function to call.
+     * @param canSkipped Call can be skipped when is delayed.
+     * @param endAfter Ending after seconds. If 0 never ending.
+     */
     void addNewTask(unsigned int interval, void (*execFun)(), bool canSkipped = true, unsigned int endAfter = 0);
 
+    /**
+     * Adding new task to que.
+     * @param interval Interval of calling passed function.
+     * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
+     * @param canSkipped Call can be skipped when is delayed.
+     * @param endAfter Ending after seconds. If 0 never ending.
+     */
     void addNewTask(unsigned int interval, TaskClassInterface *clss, bool canSkipped = true, unsigned int endAfter = 0);
+
+
+    void
+    addNewTaskCallingAt(unsigned int interval, void (*execFun)(), bool canSkipped = true, unsigned int endAfter = 0);
+
+    void addNewTaskCallingAt(unsigned int interval, TaskClassInterface *clss, bool canSkipped = true,
+                             unsigned int endAfter = 0);
+
 
     void setEndWorkTime(unsigned int minutes);
 
@@ -64,6 +87,10 @@ private:
     unsigned int taskId;
     unsigned int planedExec;
 
+    /**
+     *
+     * @param delayBetweenTasks - seconds betwen first runs tasks
+     */
     void prepareRun(unsigned int delayBetweenTasks);
 
     void runLoop();

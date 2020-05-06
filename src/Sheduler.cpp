@@ -2,6 +2,11 @@
 
 using namespace std;
 
+//TODO task deterministic
+//TODO task adaptative (calc time from end last task)
+//TODO task on specific time expropriate (other tasks in the same time was canceled)
+//TODO task on specific time not expropriated (other task is delayed)
+//TODO time_t to chrono
 
 Sheduler::Sheduler() {
     this->taskId = 0;
@@ -11,8 +16,7 @@ Sheduler::Sheduler() {
 Sheduler::Sheduler(unsigned int endAfterMinutes) {
     this->taskId = 0;
     this->planedExec = 3;
-    time(&this->now);
-    this->endWorkingTime = now + endAfterMinutes * 60;
+    setEndWorkTime(endAfterMinutes);
 }
 
 Sheduler::~Sheduler() {
@@ -70,16 +74,12 @@ void Sheduler::run() {
     }
 }
 
-/**
- *
- * @param delayBetweenTasks - seconds betwen first runs tasks
- */
 void Sheduler::prepareRun(unsigned int delayBetweenTasks = 0) {
     this->shList.setAmountPlanedExec(this->planedExec);
     time(&this->now);
     Task *tsk;
     //Checking empty task list
-    if (this->taskList.size() == 0)
+    if (this->taskList.empty())
         throw "Task list is empty";
 
     for (int i = 0; i < this->taskList.size(); i++) {

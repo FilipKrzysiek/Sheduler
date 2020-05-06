@@ -5,8 +5,6 @@
 #ifndef LOGLIB_TASKCLASSIF_H
 #define LOGLIB_TASKCLASSIF_H
 
-#endif //LOGLIB_TASKCLASSIF_H
-
 class TaskClassIf: public Task{
 public:
     TaskClassIf(unsigned int id, unsigned int interval, TaskClassInterface *clss, bool canSkipped = true, unsigned int endAfter = 0);
@@ -16,3 +14,5 @@ public:
 private:
     TaskClassInterface *clss;
 };
+
+#endif //LOGLIB_TASKCLASSIF_H
