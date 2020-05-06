@@ -12,7 +12,7 @@ class Task
         virtual void execute() = 0;
 
         //Getters
-        time_t getLastExecute();
+        std::chrono::time_point<std::chrono::system_clock> getLastExecute();
         bool getCanSkipped();
 
         /**
@@ -20,17 +20,15 @@ class Task
          * @return
          */
         bool outOfTime();
-        time_t getEndTime();
+        std::chrono::time_point<std::chrono::system_clock> getEndTime();
         unsigned int getId();
-        unsigned int getInterval();
+        std::chrono::seconds getInterval();
 
 protected:
     unsigned int id;
-    unsigned int interval;
+    std::chrono::seconds interval;
     bool canSkipped;
-    time_t now;
-    time_t endWorkTime;
-    time_t lastExecute;
+    std::chrono::time_point<std::chrono::system_clock> endWorkTime, lastExecute;
 private:
 
     void (*taskFun)();

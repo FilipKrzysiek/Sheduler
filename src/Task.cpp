@@ -1,10 +1,10 @@
 #include "../includes/Task.h"
 
-time_t Task::getLastExecute() {
+std::chrono::time_point<std::chrono::system_clock> Task::getLastExecute() {
     return this->lastExecute;
 }
 
-time_t Task::getEndTime() {
+std::chrono::time_point<std::chrono::system_clock> Task::getEndTime() {
     return this->endWorkTime;
 }
 
@@ -13,15 +13,14 @@ bool Task::getCanSkipped() {
 }
 
 bool Task::outOfTime() {
-    time(&now);
-    return now < endWorkTime;
+    return std::chrono::system_clock::now() < endWorkTime;
 }
 
 unsigned int Task::getId() {
     return this->id;
 }
 
-unsigned int Task::getInterval() {
+std::chrono::seconds Task::getInterval() {
     return interval;
 }
 /*

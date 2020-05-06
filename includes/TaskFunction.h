@@ -1,17 +1,20 @@
 #ifndef TASKFUNCTION_H
 #define TASKFUNCTION_H
 
+using namespace std::chrono_literals;
 
-class TaskFunction : public Task
-{
-    public:
-        TaskFunction(unsigned int id, unsigned int interval, void (*execFun)(), bool canSkipped = true, unsigned int endAfter = 0);
-        virtual ~TaskFunction(){};
-        void execute() override ;
+class TaskFunction : public Task {
+public:
+    TaskFunction(unsigned int id, std::chrono::seconds interval, void (*execFun)(), bool canSkipped = true,
+                 std::chrono::seconds endAfter = 0s);
 
-    protected:
+    virtual ~TaskFunction() {};
 
-    private:
+    void execute() override;
+
+protected:
+
+private:
     void (*execFun)();
 };
 

@@ -11,13 +11,13 @@ public:
 
     bool next();
     Task *getTask();
-    time_t getExecTime();
-    time_t getNextExecTime();
+    chrono::time_point<chrono::system_clock> getExecTime();
+    chrono::time_point<chrono::system_clock> getNextExecTime();
     bool nextIsTheSame();
     bool nextIsExisting();
     bool isExisting();
     void setAmountPlanedExec(unsigned int ne);
-    void add(Task *tsk, time_t timeExec);
+    void add(Task *tsk, chrono::time_point<chrono::system_clock> timeExec);
 
     void printTasksId();
     string getTaskTimeList();
@@ -28,10 +28,10 @@ private:
     class waitTask {
     public:
         Task *task;
-        time_t timeExec;
+        chrono::time_point<chrono::system_clock> timeExec;
         waitTask *next = nullptr;
 
-        waitTask(Task *task, time_t timeExec, waitTask *next = nullptr) {
+        waitTask(Task *task, chrono::time_point<chrono::system_clock> timeExec, waitTask *next = nullptr) {
             this->task = task;
             this->timeExec = timeExec;
             this->next = next;

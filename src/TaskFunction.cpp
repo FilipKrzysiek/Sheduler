@@ -1,20 +1,17 @@
 #include "../includes/TaskFunction.h"
 
-TaskFunction::TaskFunction(unsigned int id, unsigned int interval, void (*execFun)(), bool canSkipped, unsigned int endAfter)
-{
+TaskFunction::TaskFunction(unsigned int id, std::chrono::seconds interval, void (*execFun)(), bool canSkipped,
+                           std::chrono::seconds endAfter) {
     this->id = id;
     this->interval = interval;
     this->execFun = execFun;
     this->canSkipped = canSkipped;
-    if(endAfter > 0){
-        time(&this->now);
-        this->endWorkTime = now + endAfter * 60;
+    if (endAfter > 0s) {
+        this->endWorkTime = std::chrono::system_clock::now() + endAfter * 60;
     }
 }
 
-void TaskFunction::execute()
-{
-    time(&this->now);
-    this->lastExecute = now;
+void TaskFunction::execute() {
+    this->lastExecute = std::chrono::system_clock::now();
     this->execFun();
 }

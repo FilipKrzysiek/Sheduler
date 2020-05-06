@@ -13,45 +13,55 @@ Sheduler::Sheduler() {
     this->planedExec = 3;
 }
 
-Sheduler::Sheduler(unsigned int endAfterMinutes) {
+Sheduler::Sheduler(chrono::minutes endAfterMinutes) {
     this->taskId = 0;
     this->planedExec = 3;
-    setEndWorkTime(endAfterMinutes);
+    setEndWorkTimeAfter(endAfterMinutes);
 }
 
 Sheduler::~Sheduler() {
     //dtor
 }
 
-void Sheduler::addNewTask(unsigned int interval, void (*execFun)(), bool canSkipped, unsigned int endAfter) {
+void Sheduler::addNewTask(chrono::seconds interval, void (*execFun)(), bool canSkipped, chrono::seconds endAfter) {
     //Task *newTask = new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter);
     this->taskList.push_back(new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter));
 
     this->taskId++;
 }
 
-void Sheduler::addNewTask(unsigned int interval, TaskClassInterface *clss, bool canSkipped, unsigned int endAfter) {
+void
+Sheduler::addNewTask(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped, chrono::seconds endAfter) {
     //Task *newTask = new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter);
-    this->taskList.push_back(new TaskClassIf(this->taskId, interval, clss, canSkipped, endAfter));
+    this->taskList.push_back(new TaskClass(this->taskId, interval, clss, canSkipped, endAfter));
 
     this->taskId++;
 }
 
-void Sheduler::setEndWorkTime(unsigned int minutes) {
-    time(&this->now);
-    this->endWorkingTime = now + minutes * 60;
+void Sheduler::setEndWorkTimeAfter(chrono::minutes minutes) {
+    this->endWorkingTime = chrono::system_clock::now() + minutes;
+    flgEndWorkTimeEnabled = true;
 }
 
-void Sheduler::setMaxTimeGap(unsigned short minutes) {
-    if (minutes > 70)
+void Sheduler::setEndWorkTime(chrono::time_point<chrono::system_clock> date) {
+    if (date < chrono::system_clock::now())
+        throw "Setted end time before start time";
+
+    endWorkingTime = date;
+    flgEndWorkTimeEnabled = true;
+}
+
+void Sheduler::setMaxTimeGap(chrono::minutes minutes) {
+    if (minutes > 70min)
         throw "Trying set to big max time gap. Max value is 70minutes";
 
     maxTimeGap = minutes * 1000 * 60;
+    maxTimeGap = minutes;
 }
 
 void Sheduler::run() {
-    this->prepareRun(1);
-    if (this->endWorkingTime == 0) {
+    this->prepareRun(1s);
+    if (!flgEndWorkTimeEnabled) {
         while (1) {
             if (this->shList.isExisting()) {
                 this->runLoop();
@@ -60,12 +70,13 @@ void Sheduler::run() {
             }
         }
     } else {
-        cout << now << " - " << endWorkingTime << endl;
+        cout << chrono::system_clock::to_time_t(now) << " - " << chrono::system_clock::to_time_t(endWorkingTime)
+             << endl;
         while (now < this->endWorkingTime) {
             //this->shList.printTasksId();
             if (this->shList.isExisting()) {
                 this->runLoop();
-                time(&now);
+                now = std::chrono::system_clock::now();
             } else {
                 //End work when nothing to work
                 break;
@@ -74,9 +85,9 @@ void Sheduler::run() {
     }
 }
 
-void Sheduler::prepareRun(unsigned int delayBetweenTasks = 0) {
+void Sheduler::prepareRun(chrono::milliseconds delayBetweenTasks = 0ms) {
     this->shList.setAmountPlanedExec(this->planedExec);
-    time(&this->now);
+    now = std::chrono::system_clock::now();
     Task *tsk;
     //Checking empty task list
     if (this->taskList.empty())
@@ -85,7 +96,7 @@ void Sheduler::prepareRun(unsigned int delayBetweenTasks = 0) {
     for (int i = 0; i < this->taskList.size(); i++) {
         tsk = this->taskList.at(i);
         for (int j = 0; j < this->planedExec; j++) {
-            time_t timeTo = j * tsk->getInterval() + now + delayBetweenTasks * i;
+            chrono::time_point<chrono::system_clock> timeTo = j * tsk->getInterval() + now + delayBetweenTasks * i;
             if (tsk->getEndTime() > timeTo)
                 this->shList.add(tsk, timeTo);
         }
@@ -93,11 +104,11 @@ void Sheduler::prepareRun(unsigned int delayBetweenTasks = 0) {
 }
 
 void Sheduler::runLoop() {
-    time_t thisTime;
+    chrono::time_point<chrono::system_clock> thisTime;
     thisTime = this->shList.getExecTime();
     //There no destructing interval, but nie uwzględnia delays.
 
-    time(&now);
+    now = std::chrono::system_clock::now();
     this->shList.addActual();
 
     if (this->shList.nextIsExisting()) {
@@ -118,15 +129,15 @@ void Sheduler::runLoop() {
         } else if (thisTime <= now) {
             this->executeTask();
         } else {
-            sleept = calcSleepTime(thisTime);
-            sleep(sleept);
+            slept = calcSleepTime(thisTime);
+            this_thread::sleep_for(slept);
             this->executeTask();
         }
     } else {
         //Execute last job
         if (thisTime > now) {
-            sleept = calcSleepTime(thisTime);
-            sleep(sleept);
+            slept = calcSleepTime(thisTime);
+            this_thread::sleep_for(slept);
         }
         this->executeTask();
     }
@@ -138,13 +149,13 @@ void Sheduler::executeTask() {
     this->shList.next();
 }
 
-time_t Sheduler::calcSleepTime(time_t execTime) {
-    execTime = execTime - now;
-    if (execTime > maxTimeGap || execTime < 0) {
+chrono::milliseconds Sheduler::calcSleepTime(chrono::time_point<chrono::system_clock> execTime) {
+    chrono::milliseconds sleeptime = chrono::duration_cast<chrono::milliseconds>(execTime - now);
+    if (sleeptime > maxTimeGap || sleeptime < 0s) {
         throw "Error calculed time between tasks was bigger than setted max time gap";
     }
 
-    return execTime * 1000;
+    return sleeptime;
 }
 
 
@@ -152,6 +163,6 @@ string Sheduler::getTaskTimeList() {
     return shList.getTaskTimeList();
 }
 
-time_t Sheduler::getSleept() {
-    return sleept;
+chrono::milliseconds Sheduler::getSleept() {
+    return slept;
 }

@@ -49,18 +49,18 @@ Task *ShedulerList::getTask() {
     //    return nullptr;
 }
 
-time_t ShedulerList::getExecTime() {
+chrono::time_point<chrono::system_clock> ShedulerList::getExecTime() {
     if (this->isExisting())
         return this->wTaskActual->timeExec;
     else
-        return 0;
+        return chrono::system_clock::from_time_t(0);
 }
 
-time_t ShedulerList::getNextExecTime() {
+chrono::time_point<chrono::system_clock> ShedulerList::getNextExecTime() {
     if (this->nextIsExisting())
         return this->wTaskActual->next->timeExec;
     else
-        return 0;
+        return chrono::system_clock::from_time_t(0);
 }
 
 bool ShedulerList::nextIsTheSame() {
@@ -111,7 +111,8 @@ string ShedulerList::getTaskTimeList() {
     char buf[15];
     temp = this->wTaskActual;
     while (temp != nullptr) {
-        lt = localtime(&temp->timeExec);
+        time_t timeTemp = chrono::system_clock::to_time_t(temp->timeExec);
+        lt = localtime(&timeTemp);
         txt += to_string(temp->task->getId());
         txt += " - ";
         strftime(buf, 15, "%T", lt);
@@ -164,7 +165,7 @@ void ShedulerList::add(Task *tsk, time_t timeExec) {
     }
 }*/
 
-void ShedulerList::add(Task *tsk, time_t timeExec) {
+void ShedulerList::add(Task *tsk, chrono::time_point<chrono::system_clock> timeExec) {
     if (isExisting()) {
         waitTask *iter = this->wTaskActual, *prev = nullptr;
 
@@ -199,11 +200,11 @@ void ShedulerList::add(Task *tsk, time_t timeExec) {
 void ShedulerList::addActual() {
     Task *tsk;
     tsk = this->getTask();
-    time_t nextExecTime, now;
-    time(&now);
+    chrono::time_point<chrono::system_clock> nextExecTime, now;
+    now = chrono::system_clock::now();
     if (tsk != nullptr) {
         waitTask *wTask = wTaskActual;
-        time_t lastTime = wTaskActual->timeExec;
+        chrono::time_point<chrono::system_clock> lastTime = wTaskActual->timeExec;
         wTask = wTask->next;
         //Find last time this task exec on list
         while (wTask != nullptr) {
