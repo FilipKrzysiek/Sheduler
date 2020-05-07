@@ -6,7 +6,6 @@ using namespace std;
 //TODO task adaptative (calc time from end last task)
 //TODO task on specific time expropriate (other tasks in the same time was canceled)
 //TODO task on specific time not expropriated (other task is delayed)
-//TODO time_t to chrono
 
 Sheduler::Sheduler() {
     this->taskId = 0;
@@ -55,7 +54,6 @@ void Sheduler::setMaxTimeGap(chrono::minutes minutes) {
     if (minutes > 70min)
         throw "Trying set to big max time gap. Max value is 70minutes";
 
-    maxTimeGap = minutes * 1000 * 60;
     maxTimeGap = minutes;
 }
 

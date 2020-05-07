@@ -41,6 +41,9 @@ public:
 
     virtual ~Sheduler();
 
+    //TODO If no passed endAfter program not start, end all correctly. Not error, but not run any tasks.
+    //TODO endAfter not working, passed tasks work over end time
+    //TODO Exceptions as exception, not as const char*
     /**
      * Adding new task to que.
      * @param interval Interval of calling passed function.
@@ -97,7 +100,7 @@ private:
     //time_t endWorkingTime, now, slept, maxTimeGap = 1000 * 60 * 10;
     chrono::time_point<chrono::system_clock> endWorkingTime, now;
     chrono::milliseconds slept;
-    chrono::seconds  maxTimeGap;
+    chrono::seconds  maxTimeGap = 10min;
     vector<Task *> taskList;
     ShedulerList shList;
     unsigned int taskId;

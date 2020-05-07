@@ -7,7 +7,7 @@ TaskFunction::TaskFunction(unsigned int id, std::chrono::seconds interval, void 
     this->execFun = execFun;
     this->canSkipped = canSkipped;
     if (endAfter > 0s) {
-        this->endWorkTime = std::chrono::system_clock::now() + endAfter * 60;
+        this->endWorkTime = std::chrono::system_clock::now() + endAfter;
     }
 }
 
