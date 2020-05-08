@@ -11,7 +11,12 @@ TaskClass::TaskClass(unsigned int id, std::chrono::seconds interval, TaskClassIn
     this->clss = clss;
     this->canSkipped = canSkipped;
     if (endAfter > 0s) {
-        this->endWorkTime = std::chrono::system_clock::now() + endAfter * 60;
+        this->endWorkTime = std::chrono::system_clock::now() + endAfter;
+        isNeverEnding = false;
+    } else if(endAfter == 0s){
+        isNeverEnding = true;
+    } else {
+        throw "Passed endAfter less than 0";
     }
 }
 

@@ -23,6 +23,10 @@ unsigned int Task::getId() {
 std::chrono::seconds Task::getInterval() {
     return interval;
 }
+
+bool Task::getIsNeverEnding() {
+    return isNeverEnding;
+}
 /*
 Task::~Task()
 {

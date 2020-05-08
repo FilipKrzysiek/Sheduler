@@ -34,6 +34,8 @@ public:
      */
     bool outOfTime();
 
+    bool getIsNeverEnding();
+
     std::chrono::time_point<std::chrono::system_clock> getEndTime();
 
     unsigned int getId();
@@ -44,6 +46,7 @@ protected:
     unsigned int id;
     std::chrono::seconds interval;
     bool canSkipped;
+    bool isNeverEnding;
     std::chrono::time_point<std::chrono::system_clock> endWorkTime, lastExecute;
 private:
 

@@ -1,22 +1,5 @@
 #ifndef SHEDULER_H
 
-//#ifdef _WIN32
-//#define _HAS_STD_BYTE 0
-//#include <windows.h>
-//void sleep(unsigned milliseconds)
-//{
-//    Sleep(milliseconds);
-//}
-//#else
-//
-//#include <unistd.h>
-//
-//unsigned sleep(unsigned int milliseconds) {
-//    usleep(milliseconds * 1000); // takes microseconds
-//}
-//
-//#endif
-
 #include <vector>
 #include <string>
 #include <iostream>
@@ -37,13 +20,17 @@ class Sheduler {
 public:
     Sheduler();
 
+    /**
+     * Create sheduler and set time after app wnd work.
+     * @param endAfterMinutes
+     */
     Sheduler(chrono::minutes endAfterMinutes);
 
     virtual ~Sheduler();
 
-    //TODO If no passed endAfter program not start, end all correctly. Not error, but not run any tasks.
-    //TODO endAfter not working, passed tasks work over end time
     //TODO Exceptions as exception, not as const char*
+    //TODO Overwrite method setEndWorkTime to pass year, mont, day, hour, minute, second and hour, minute, second
+    //TODO Documentation
     /**
      * Adding new task to que.
      * @param interval Interval of calling passed function.
@@ -88,13 +75,10 @@ public:
      */
     void setMaxTimeGap(chrono::minutes minutes);
 
+    /**
+     * @brief Run sheduler, start executing tasks.
+     */
     void run();
-
-    string getTaskTimeList();
-
-    chrono::milliseconds getSleept();
-
-protected:
 
 private:
     //time_t endWorkingTime, now, slept, maxTimeGap = 1000 * 60 * 10;
@@ -118,6 +102,10 @@ private:
     void executeTask();
 
     chrono::milliseconds calcSleepTime(chrono::time_point<chrono::system_clock> execTime);
+
+    string getTaskTimeList();
+
+    chrono::milliseconds getSleept();
 };
 
 #endif // SHEDULER_H

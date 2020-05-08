@@ -95,7 +95,7 @@ void Sheduler::prepareRun(chrono::milliseconds delayBetweenTasks = 0ms) {
         tsk = this->taskList.at(i);
         for (int j = 0; j < this->planedExec; j++) {
             chrono::time_point<chrono::system_clock> timeTo = j * tsk->getInterval() + now + delayBetweenTasks * i;
-            if (tsk->getEndTime() > timeTo)
+            if (tsk->getIsNeverEnding() || tsk->getEndTime() > timeTo)
                 this->shList.add(tsk, timeTo);
         }
     }

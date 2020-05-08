@@ -218,7 +218,7 @@ void ShedulerList::addActual() {
         while (nextExecTime < now) {
             nextExecTime += tsk->getInterval();
         }
-        if (tsk->getEndTime() > nextExecTime)
+        if (tsk->getIsNeverEnding() || tsk->getEndTime() > nextExecTime)
             this->add(tsk, nextExecTime);
     }
 }
