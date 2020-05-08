@@ -42,7 +42,7 @@ void Sheduler::setEndWorkTimeAfter(chrono::minutes minutes) {
     flgEndWorkTimeEnabled = true;
 }
 
-void Sheduler::setEndWorkTime(chrono::time_point<chrono::system_clock> date) {
+void Sheduler::setEndWorkTime(chrono::time_point<chrono::system_clock> date, bool getOnlyTime) {
     if (date < chrono::system_clock::now())
         throw "Setted end time before start time";
 
