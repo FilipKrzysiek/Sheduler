@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include "Exception.h"
 #include "TaskClassInterface.h"
 #include "../src/Task.cpp"
 #include "../src/TaskFunction.cpp"

@@ -40,7 +40,7 @@ void Sheduler::setEndWorkTimeAfter(chrono::minutes minutes) {
 
 void Sheduler::setEndWorkTime(chrono::time_point<chrono::system_clock> date) {
     if (date < chrono::system_clock::now())
-        throw "Setted end time before start time";
+        throw Exception("Setted end time before start time");
 
     endWorkingTime = date;
     flgEndWorkTimeEnabled = true;
@@ -48,7 +48,7 @@ void Sheduler::setEndWorkTime(chrono::time_point<chrono::system_clock> date) {
 
 void Sheduler::setMaxTimeGap(chrono::minutes minutes) {
     if (minutes > 70min)
-        throw "Trying set to big max time gap. Max value is 70minutes";
+        throw Exception("Trying set to big max time gap. Max value is 70minutes");
 
     maxTimeGap = minutes;
 }
@@ -85,7 +85,7 @@ void Sheduler::prepareRun() {
     Task *tsk;
     //Checking empty task list
     if (this->taskList.empty())
-        throw "Task list is empty";
+        throw Exception("Task list is empty");
 
     for (int i = 0; i < this->taskList.size(); i++) {
         tsk = this->taskList.at(i);
@@ -146,7 +146,7 @@ void Sheduler::executeTask() {
 chrono::milliseconds Sheduler::calcSleepTime(chrono::time_point<chrono::system_clock> execTime) {
     chrono::milliseconds sleeptime = chrono::duration_cast<chrono::milliseconds>(execTime - now);
     if (sleeptime > maxTimeGap || sleeptime < 0s) {
-        throw "Error calculed time between tasks was bigger than setted max time gap";
+        throw Exception("Error calculed time between tasks was bigger than setted max time gap");
     }
 
     return sleeptime;

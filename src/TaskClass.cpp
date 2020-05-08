@@ -16,7 +16,7 @@ TaskClass::TaskClass(unsigned int id, std::chrono::seconds interval, TaskClassIn
     } else if(endAfter == 0s){
         isNeverEnding = true;
     } else {
-        throw "Passed endAfter less than 0";
+        throw Exception("Passed endAfter less than 0");
     }
 }
 
