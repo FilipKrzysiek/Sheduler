@@ -18,10 +18,6 @@ Sheduler::Sheduler(chrono::minutes endAfterMinutes) {
     setEndWorkTimeAfter(endAfterMinutes);
 }
 
-Sheduler::~Sheduler() {
-    //dtor
-}
-
 void Sheduler::addNewTask(chrono::seconds interval, void (*execFun)(), bool canSkipped, chrono::seconds endAfter) {
     //Task *newTask = new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter);
     this->taskList.push_back(new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter));
@@ -58,9 +54,9 @@ void Sheduler::setMaxTimeGap(chrono::minutes minutes) {
 }
 
 void Sheduler::run() {
-    this->prepareRun(1s);
+    this->prepareRun();
     if (!flgEndWorkTimeEnabled) {
-        while (1) {
+        while (true) {
             if (this->shList.isExisting()) {
                 this->runLoop();
             } else {
@@ -83,7 +79,7 @@ void Sheduler::run() {
     }
 }
 
-void Sheduler::prepareRun(chrono::milliseconds delayBetweenTasks = 0ms) {
+void Sheduler::prepareRun() {
     this->shList.setAmountPlanedExec(this->planedExec);
     now = std::chrono::system_clock::now();
     Task *tsk;
@@ -163,4 +159,8 @@ string Sheduler::getTaskTimeList() {
 
 chrono::milliseconds Sheduler::getSleept() {
     return slept;
+}
+
+void Sheduler::setDelayBetweenTasks(chrono::milliseconds milliseconds) {
+    delayBetweenTasks = milliseconds;
 }

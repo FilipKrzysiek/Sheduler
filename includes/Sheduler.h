@@ -26,7 +26,7 @@ public:
      */
     Sheduler(chrono::minutes endAfterMinutes);
 
-    virtual ~Sheduler();
+    virtual ~Sheduler() {}
 
     //TODO Exceptions as exception, not as const char*
     //TODO Overwrite method setEndWorkTime to pass year, mont, day, hour, minute, second and hour, minute, second
@@ -76,6 +76,14 @@ public:
     void setMaxTimeGap(chrono::minutes minutes);
 
     /**
+     * Set delay between tasks on theirs first run (that all task not started at the same time, because second, third...
+     * task was delayed when they started).
+     * Default 1s.
+     * @param milliseconds time between tasks
+     */
+    void setDelayBetweenTasks(chrono::milliseconds milliseconds);
+
+    /**
      * @brief Run sheduler, start executing tasks.
      */
     void run();
@@ -83,7 +91,7 @@ public:
 private:
     //time_t endWorkingTime, now, slept, maxTimeGap = 1000 * 60 * 10;
     chrono::time_point<chrono::system_clock> endWorkingTime, now;
-    chrono::milliseconds slept;
+    chrono::milliseconds slept = 0ms, delayBetweenTasks = 1s;
     chrono::seconds  maxTimeGap = 10min;
     vector<Task *> taskList;
     ShedulerList shList;
@@ -95,7 +103,7 @@ private:
      *
      * @param delayBetweenTasks - seconds betwen first runs tasks
      */
-    void prepareRun(chrono::milliseconds delayBetweenTasks);
+    void prepareRun();
 
     void runLoop();
 
