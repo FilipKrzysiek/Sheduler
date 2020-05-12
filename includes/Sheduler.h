@@ -6,7 +6,6 @@
 #include <chrono>
 #include <thread>
 #include "TaskClassInterface.h"
-#include "TaskRepeatable.h"
 #include "../src/Task.cpp"
 #include "../src/TaskFunction.cpp"
 #include "../src/TaskClass.cpp"

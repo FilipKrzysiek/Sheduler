@@ -16,6 +16,14 @@ TaskFunction::TaskFunction(unsigned int id, std::chrono::seconds interval, void 
     }
 }
 
+TaskFunction::TaskFunction(unsigned int id, std::chrono::time_point<std::chrono::system_clock> executeTime,
+                           void (*execFun)(), bool skipOtherTasks) {
+    this->id = id;
+    this->staticExecuteTime = executeTime;
+    this->execFun = execFun;
+    this->skipOtherTasks = skipOtherTasks;
+}
+
 
 void TaskFunction::execute() {
     this->lastExecute = std::chrono::system_clock::now();

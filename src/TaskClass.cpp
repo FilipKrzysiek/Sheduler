@@ -20,6 +20,14 @@ TaskClass::TaskClass(unsigned int id, std::chrono::seconds interval, TaskClassIn
     }
 }
 
+TaskClass::TaskClass(unsigned int id, std::chrono::time_point<std::chrono::system_clock> executeTime,
+                     TaskClassInterface *clss, bool skipOtherTasks) {
+    this->id = id;
+    this->staticExecuteTime = executeTime;
+    this->clss = clss;
+    this->skipOtherTasks = skipOtherTasks;
+}
+
 void TaskClass::execute() {
     this->lastExecute = std::chrono::system_clock::now();
     this->clss->execute();
