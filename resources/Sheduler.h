@@ -169,16 +169,16 @@ public:
 //                             unsigned int endAfter = 0);
 
     /**
-     * Set after how many minutes sheduler must end work. If not setted sheduler never ending.
+     * Set after how many minutes sheduler must end work. If not set sheduler never ending.
      * @param minutes Minutes from begin to end sheduler work
      */
     void setEndWorkTimeAfter(chrono::minutes minutes);
 
     /**
-     * Set datetime when sheduler muest end work. If not setted sheduler never ending.
+     * Set datetime when sheduler muest end work. If not set sheduler never ending.
      * @param date Date when sheduler must end work time
      */
-    void setEndWorkTime(chrono::time_point<chrono::system_clock> date);
+    void setEndWorkTime(chrono::time_point<chrono::system_clock> date, bool getOnlyTime);
 
     /**
      * @brief Set max time gap between tasks. If time gap is higher than declared throw error.

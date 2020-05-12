@@ -4,6 +4,10 @@ std::chrono::time_point<std::chrono::system_clock> Task::getLastExecute() {
     return this->lastExecute;
 }
 
+unsigned int Task::getId() {
+    return this->id;
+}
+
 std::chrono::time_point<std::chrono::system_clock> Task::getEndTime() {
     return this->endWorkTime;
 }
@@ -16,10 +20,6 @@ bool Task::outOfTime() {
     return std::chrono::system_clock::now() < endWorkTime;
 }
 
-unsigned int Task::getId() {
-    return this->id;
-}
-
 std::chrono::seconds Task::getInterval() {
     return interval;
 }
@@ -27,9 +27,7 @@ std::chrono::seconds Task::getInterval() {
 bool Task::getIsNeverEnding() {
     return isNeverEnding;
 }
-/*
-Task::~Task()
-{
-    //dtor
+
+std::chrono::time_point<std::chrono::system_clock> Task::getStaticExecuteTime() {
+    return staticExecuteTime;
 }
-*/

@@ -2,9 +2,10 @@
 // Created by krzysiu on 21.09.2019.
 //
 
-#ifndef LOGLIB_TASKCLASSIF_H
-#define LOGLIB_TASKCLASSIF_H
+#ifndef TASKCLASSIF_H
+#define TASKCLASSIF_H
 using namespace std::chrono_literals;
+
 
 class TaskClass : public Task {
 public:
@@ -19,4 +20,4 @@ private:
     TaskClassInterface *clss;
 };
 
-#endif //LOGLIB_TASKCLASSIF_H
+#endif //TASKCLASSIF_H

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <thread>
 #include "TaskClassInterface.h"
+#include "TaskRepeatable.h"
 #include "../src/Task.cpp"
 #include "../src/TaskFunction.cpp"
 #include "../src/TaskClass.cpp"
@@ -108,21 +109,20 @@ public:
 
 
     /**
-     * Set after how many minutes sheduler must end work. If not setted sheduler never ending.
+     * Set after how many minutes sheduler must end work. If not set sheduler never ending.
      * @param minutes Minutes from begin to end sheduler work
      */
     void setEndWorkTimeAfter(chrono::minutes minutes);
 
     /**
-     * Set datetime when sheduler muest end work. If not setted sheduler never ending.
+     * Set datetime when sheduler muest end work. If not set sheduler never ending.
      * @param date Date when sheduler must end work time
      * @param getOnlyTime Get only time, not date of end work. Default get only time (true).
      */
     void setEndWorkTime(chrono::time_point<chrono::system_clock> date, bool getOnlyTime = true);
-    //TODO add getOnlyTime to implementation
 
     /**
-     * Set datetime when scheduler must end work. If not setted scheduler never ending.
+     * Set datetime when scheduler must end work. If not set scheduler never ending.
      * @param hour Hour at scheduler must end work.
      * @param minute Minute of passed hour, when scheduler must end work.
      * @param second Second of passed minute, when scheduler must end work.
@@ -134,7 +134,7 @@ public:
                         unsigned short year = 65535, unsigned short month = 65535, unsigned short day = 65535);
 
     /**
-     * Set datetime when scheduler muest end work. If not setted scheduler never ending.
+     * Set datetime when scheduler muest end work. If not set scheduler never ending.
      * @param date Date when scheduler must end work time.
      * @param getOnlyTime Get only time, not date of end work. Default get only time (true).
      */
@@ -171,6 +171,12 @@ private:
     void runLoop();
 
     void executeTask();
+
+    bool checkCorrectTime(unsigned short hour, unsigned short minute, unsigned short second);
+
+    bool checkCorrectDate(unsigned short year, unsigned short month, unsigned short day);
+
+    time_t calculateEndTime(time_t base, unsigned short hour, unsigned short minute, unsigned short second);
 
     chrono::milliseconds calcSleepTime(chrono::time_point<chrono::system_clock> execTime);
 
