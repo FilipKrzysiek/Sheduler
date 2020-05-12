@@ -23,6 +23,11 @@ public:
      */
     bool getSkipOtherTasks() const;
 
+    /**
+     * Increment date by 24h
+     */
+    void incrementStaticExecuteTime();
+
 protected:
     std::chrono::time_point<std::chrono::system_clock> staticExecuteTime;
 

@@ -11,3 +11,8 @@ std::chrono::time_point<std::chrono::system_clock> TaskStaticTime::getStaticExec
 bool TaskStaticTime::getSkipOtherTasks() const {
     return skipOtherTasks;
 }
+
+void TaskStaticTime::incrementStaticExecuteTime() {
+    staticExecuteTime = staticExecuteTime + std::chrono::hours(24);
+
+}
