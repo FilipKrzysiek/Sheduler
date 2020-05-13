@@ -3,10 +3,7 @@
 
 using namespace std;
 
-//TODO task deterministic
 //TODO task adaptative (calc time from end last task)
-//TODO task on specific time expropriate (other tasks in the same time was canceled)
-//TODO task on specific time not expropriated (other task is delayed)
 
 Scheduler::Scheduler() {
     this->taskId = 0;
@@ -56,7 +53,7 @@ void Scheduler::addNewTaskCallingAt(time_t timeToExecute, void (*execFun)(), boo
 void Scheduler::addNewTaskCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
                                     void (*execFun)(), bool skippOtherTasks) {
     if (!checkCorrectTime(hour, minute, second))
-        throw "Passed time to create task AT is incorrect";
+        throw Exception("Passed time to create task AT is incorrect");
 
     time_t nowTimeT;
     time(&nowTimeT);
@@ -78,7 +75,7 @@ void Scheduler::addNewTaskCallingAt(time_t timeToExecute, TaskClassInterface *cl
 void Scheduler::addNewTaskCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
                                     TaskClassInterface *clss, bool skippOtherTasks) {
     if (!checkCorrectTime(hour, minute, second))
-        throw "Passed time to create task AT is incorrect";
+        throw Exception("Passed time to create task AT is incorrect");
 
     time_t nowTimeT;
     time(&nowTimeT);
@@ -97,7 +94,7 @@ void Scheduler::setEndWorkTime(system_clock_time date, bool getOnlyTime) {
         if (getOnlyTime) {
             date = date + 24h;
         } else
-            throw "Set end time before start time";
+            throw Exception("Set end time before start time");
     }
 
     endWorkingTime = date;
@@ -106,7 +103,7 @@ void Scheduler::setEndWorkTime(system_clock_time date, bool getOnlyTime) {
 
 void Scheduler::setMaxTimeGap(chrono::minutes minutes) {
     if (minutes > 70min)
-        throw "Trying set to big max time gap. Max value is 70minutes";
+        throw Exception("Trying set to big max time gap. Max value is 70minutes");
 
     maxTimeGap = minutes;
 }
@@ -190,14 +187,14 @@ void Scheduler::setEndWorkTime(unsigned short hour, unsigned short minute, unsig
             nowTimeT = calculateEndTime(nowTimeT, hour, minute, second);
             setEndWorkTime(nowTimeT, true);
         } else {
-            throw "At setEndWorkingTime passed not all date. Maybe missing day or month and day.";
+            throw Exception("At setEndWorkingTime passed not all date. Maybe missing day or month and day.");
         }
     } else {
         if (!checkCorrectTime(hour, minute, second))
-            throw "Passed time to setEndWorkTime is incorrect";
+            throw Exception("Passed time to setEndWorkTime is incorrect");
 
         if (!checkCorrectDate(year, month, day))
-            throw "Passed date to setEndWorkingTime is incorrect";
+            throw Exception("Passed date to setEndWorkingTime is incorrect");
 
         time_t newTimeT;
         time(&newTimeT);
@@ -214,7 +211,7 @@ void Scheduler::setEndWorkTime(unsigned short hour, unsigned short minute, unsig
         time_t nowTimeT;
         time(&nowTimeT);
         if (nowTimeT > newTimeT)
-            throw "Passed time to setEndWorkingTime is in the past";
+            throw Exception("Passed time to setEndWorkingTime is in the past");
 
         setEndWorkTime(newTimeT, false);
     }
@@ -237,7 +234,7 @@ void Scheduler::setDelayBetweenTasks(const chrono::milliseconds &delayBetweenTas
 void Scheduler::run() {
     this->prepareRun();
     if (!flgEndWorkTimeEnabled) {
-        while (1) {
+        while (true) {
             if ((!schedulerQueueRepeatable.isExisting() && flgEndWhenRepeatableEnd) ||
                 (!schedulerQueueRepeatable.isExisting() && !schedulerQueueStaticTime.isExisting())) {
                 break;
@@ -263,10 +260,10 @@ void Scheduler::run() {
 void Scheduler::prepareRun() {
     if (flgEndWhenRepeatableEnd) {
         if (repeatableTaskList.empty())
-            throw "Repeatable list is empty. Set flg endWhenRepeatableEnd = true";
+            throw Exception("Repeatable list is empty. Set flg endWhenRepeatableEnd = true");
     } else {
         if (repeatableTaskList.empty() && staticTimeTaskList.empty())
-            throw "Task lists is empty. No added tasks to list!";
+            throw Exception("Task lists is empty. No added tasks to list!");
     }
 
     prepareRunRepeatable();
@@ -309,7 +306,7 @@ void Scheduler::runLoop() {
 }
 
 bool Scheduler::runStaticTime() {
-    if(schedulerQueueStaticTime.isExisting()) {
+    if (schedulerQueueStaticTime.isExisting()) {
         if (now >= schedulerQueueStaticTime.getExecTime()) {
             Task *tsk = schedulerQueueStaticTime.getTask();
             tsk->incrementStaticExecuteTime();
@@ -373,8 +370,8 @@ void Scheduler::executeRepeatableTask() {
 
 chrono::milliseconds Scheduler::calcSleepTime() {
     system_clock_time execTime;
-    if(schedulerQueueRepeatable.isExisting()) {
-        if(schedulerQueueStaticTime.isExisting()) {
+    if (schedulerQueueRepeatable.isExisting()) {
+        if (schedulerQueueStaticTime.isExisting()) {
             if (schedulerQueueRepeatable.getExecTime() >= schedulerQueueStaticTime.getExecTime()) {
                 execTime = schedulerQueueStaticTime.getExecTime();
             } else {
@@ -390,9 +387,9 @@ chrono::milliseconds Scheduler::calcSleepTime() {
     }
     chrono::milliseconds sleepTime = chrono::duration_cast<chrono::milliseconds>(execTime - now);
     if (sleepTime > maxTimeGap || sleepTime < -6h) {
-        throw "Error calculating sleep time! Sleep time: " + to_string(sleepTime.count()) + " ms (max time gap" +
-        to_string(maxTimeGap.count()) + " s, max accepted delay -6h)";
-    } else if(sleepTime < 0ms)
+        throw Exception("Error calculating sleep time! Sleep time: " + to_string(sleepTime.count()) +
+                " ms (max time gap" + to_string(maxTimeGap.count()) + " s, max accepted delay -6h)");
+    } else if (sleepTime < 0ms)
         sleepTime = 0ms;
 
     return sleepTime;
