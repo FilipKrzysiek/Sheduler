@@ -309,19 +309,21 @@ void Scheduler::runLoop() {
 }
 
 bool Scheduler::runStaticTime() {
-    if (now >= schedulerQueueStaticTime.getExecTime()) {
-        Task *tsk = schedulerQueueStaticTime.getTask();
-        tsk->incrementStaticExecuteTime();
-        schedulerQueueStaticTime.addTask(tsk, schedulerQueueStaticTime.getExecTime());
+    if(schedulerQueueStaticTime.isExisting()) {
+        if (now >= schedulerQueueStaticTime.getExecTime()) {
+            Task *tsk = schedulerQueueStaticTime.getTask();
+            tsk->incrementStaticExecuteTime();
+            schedulerQueueStaticTime.addTask(tsk, tsk->getStaticExecuteTime());
 
-        tsk->execute();
+            tsk->execute();
 
-        if (tsk->getSkipOtherTasks()) {
-            schedulerQueueRepeatable.clearQueue();
-            prepareRunRepeatable();
+            if (tsk->getSkipOtherTasks()) {
+                schedulerQueueRepeatable.clearQueue();
+                prepareRunRepeatable();
+            }
+            schedulerQueueStaticTime.next();
+            return true;
         }
-        schedulerQueueStaticTime.next();
-        return true;
     }
     return false;
 }
@@ -329,7 +331,7 @@ bool Scheduler::runStaticTime() {
 void Scheduler::runRepeatable() {
     schedulerQueueRepeatable.addActual();
 
-    if (now - schedulerQueueRepeatable.getExecTime() > -1s) {
+    if (now - schedulerQueueRepeatable.getExecTime() > -1s && schedulerQueueRepeatable.isExisting()) {
         if (schedulerQueueRepeatable.nextIsExisting()) {
             if (now - schedulerQueueRepeatable.getExecTime() < 1s) {
                 executeRepeatableTask();
@@ -371,15 +373,28 @@ void Scheduler::executeRepeatableTask() {
 
 chrono::milliseconds Scheduler::calcSleepTime() {
     system_clock_time execTime;
-    if (schedulerQueueRepeatable.getExecTime() >= schedulerQueueStaticTime.getExecTime()) {
-        execTime = schedulerQueueStaticTime.getExecTime();
+    if(schedulerQueueRepeatable.isExisting()) {
+        if(schedulerQueueStaticTime.isExisting()) {
+            if (schedulerQueueRepeatable.getExecTime() >= schedulerQueueStaticTime.getExecTime()) {
+                execTime = schedulerQueueStaticTime.getExecTime();
+            } else {
+                execTime = schedulerQueueRepeatable.getExecTime();
+            }
+        } else {
+            execTime = schedulerQueueRepeatable.getExecTime();
+        }
     } else {
-        execTime = schedulerQueueRepeatable.getExecTime();
+        if (schedulerQueueRepeatable.getExecTime() >= schedulerQueueStaticTime.getExecTime()) {
+            execTime = schedulerQueueStaticTime.getExecTime();
+        }
     }
     chrono::milliseconds sleepTime = chrono::duration_cast<chrono::milliseconds>(execTime - now);
-    if (sleepTime > maxTimeGap || sleepTime < 0s) {
-        throw "Error calculed time between tasks was bigger than set max time gap";
-    }
+    if (sleepTime > maxTimeGap || sleepTime < -6h) {
+        cout<<sleepTime.count()<<endl;
+        throw "Error calculating sleep time! Sleep time: " + to_string(sleepTime.count()) + " ms (max time gap" +
+        to_string(maxTimeGap.count()) + " s, max accepted delay -6h)";
+    } else if(sleepTime < 0ms)
+        sleepTime = 0ms;
 
     return sleepTime;
 }

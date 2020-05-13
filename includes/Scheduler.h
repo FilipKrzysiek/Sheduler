@@ -161,7 +161,7 @@ private:
     //time_t endWorkingTime, now, slept, maxTimeGap = 1000 * 60 * 10;
     system_clock_time endWorkingTime, now;
     chrono::milliseconds slept, delayBetweenTasks = 1s;
-    chrono::seconds maxTimeGap = 10min;
+    chrono::seconds maxTimeGap = 24h + 1min;
     vector<Task *> repeatableTaskList;
     vector<Task *> staticTimeTaskList;
     SchedulerQueue schedulerQueueRepeatable, schedulerQueueStaticTime;

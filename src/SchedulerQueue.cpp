@@ -40,10 +40,10 @@ bool SchedulerQueue::next() {
 }
 
 Task *SchedulerQueue::getTask() {
-    //if (this->nextExisting)
-    return this->wTaskActual->task;
-    //else
-    //    return nullptr;
+    if (wTaskActual != nullptr)
+        return wTaskActual->task;
+    else
+        return nullptr;
 }
 
 chrono::time_point<chrono::system_clock> SchedulerQueue::getExecTime() {
@@ -79,11 +79,11 @@ bool SchedulerQueue::nextIsExisting() {
 }
 
 bool SchedulerQueue::isExisting() {
-    if (this->wTaskActual == nullptr) {
-        this->nextExisting = false;
+    if (wTaskActual == nullptr) {
+        nextExisting = false;
         return false;
     } else {
-        this->nextExisting = true;
+        nextExisting = true;
         return true;
     }
 }
