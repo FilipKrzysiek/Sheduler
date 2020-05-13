@@ -246,8 +246,8 @@ void Scheduler::run() {
             }
         }
     } else {
-        cout << chrono::system_clock::to_time_t(now) << " - " << chrono::system_clock::to_time_t(endWorkingTime)
-             << endl;
+//        cout << chrono::system_clock::to_time_t(now) << " - " << chrono::system_clock::to_time_t(endWorkingTime)
+//             << endl;
         while (now < this->endWorkingTime) {
             //this->schedulerQueueRepeatable.printTasksId();
             if ((!schedulerQueueRepeatable.isExisting() && flgEndWhenRepeatableEnd) ||
@@ -390,7 +390,6 @@ chrono::milliseconds Scheduler::calcSleepTime() {
     }
     chrono::milliseconds sleepTime = chrono::duration_cast<chrono::milliseconds>(execTime - now);
     if (sleepTime > maxTimeGap || sleepTime < -6h) {
-        cout<<sleepTime.count()<<endl;
         throw "Error calculating sleep time! Sleep time: " + to_string(sleepTime.count()) + " ms (max time gap" +
         to_string(maxTimeGap.count()) + " s, max accepted delay -6h)";
     } else if(sleepTime < 0ms)
