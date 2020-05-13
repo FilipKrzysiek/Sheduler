@@ -124,47 +124,6 @@ string ShedulerList::getTaskTimeList() {
     return txt;
 }
 
-/*
-void ShedulerList::add(Task *tsk, time_t timeExec) {
-    if (isExisting()) {
-        waitTask *iter = this->wTaskActual, *prev = nullptr;
-
-        //prev = NULL;
-        //Inserting
-        if (iter->timeExec > timeExec) {
-            this->wTaskActual = new waitTask(tsk, timeExec, iter);
-            return;
-        }
-
-        prev = iter;
-        iter = iter->next;
-
-        while (iter != nullptr) {
-            if (iter->timeExec > timeExec) {
-                prev->next = new waitTask(tsk, timeExec, iter);
-                return;
-            } else if (iter->timeExec == timeExec) {
-                if (iter->next->task->getId() == tsk->getId()) {
-                    prev = iter;
-                    iter = iter->next;
-                    prev->next = new waitTask(tsk, timeExec, iter);
-                    return;
-                } else {
-                    prev->next = new waitTask(tsk, timeExec, iter);
-                    return;
-                }
-            }
-
-            prev = iter;
-            iter = iter->next;
-        }
-
-        prev->next = new waitTask(tsk, timeExec);
-    } else {
-        this->wTaskActual = new waitTask(tsk, timeExec);
-    }
-}*/
-
 void ShedulerList::add(Task *tsk, chrono::time_point<chrono::system_clock> timeExec) {
     if (isExisting()) {
         waitTask *iter = this->wTaskActual, *prev = nullptr;

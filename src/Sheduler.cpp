@@ -19,16 +19,14 @@ Sheduler::Sheduler(chrono::minutes endAfterMinutes) {
 }
 
 void Sheduler::addNewTask(chrono::seconds interval, void (*execFun)(), bool canSkipped, chrono::seconds endAfter) {
-    //Task *newTask = new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter);
-    this->taskList.push_back(new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter));
+    this->taskList.push_back(new TaskFunction(taskId, interval, execFun, canSkipped, endAfter));
 
     this->taskId++;
 }
 
 void
 Sheduler::addNewTask(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped, chrono::seconds endAfter) {
-    //Task *newTask = new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter);
-    this->taskList.push_back(new TaskClass(this->taskId, interval, clss, canSkipped, endAfter));
+    this->taskList.push_back(new TaskClass(taskId, interval, clss, canSkipped, endAfter));
 
     this->taskId++;
 }
@@ -66,10 +64,10 @@ void Sheduler::run() {
     } else {
         cout << chrono::system_clock::to_time_t(now) << " - " << chrono::system_clock::to_time_t(endWorkingTime)
              << endl;
-        while (now < this->endWorkingTime) {
+        while (now < endWorkingTime) {
             //this->shList.printTasksId();
-            if (this->shList.isExisting()) {
-                this->runLoop();
+            if (shList.isExisting()) {
+                runLoop();
                 now = std::chrono::system_clock::now();
             } else {
                 //End work when nothing to work
@@ -80,52 +78,52 @@ void Sheduler::run() {
 }
 
 void Sheduler::prepareRun() {
-    this->shList.setAmountPlanedExec(this->planedExec);
+    shList.setAmountPlanedExec(planedExec);
     now = std::chrono::system_clock::now();
     Task *tsk;
     //Checking empty task list
-    if (this->taskList.empty())
+    if (taskList.empty())
         throw Exception("Task list is empty");
 
-    for (int i = 0; i < this->taskList.size(); i++) {
-        tsk = this->taskList.at(i);
-        for (int j = 0; j < this->planedExec; j++) {
+    for (int i = 0; i < taskList.size(); i++) {
+        tsk = taskList.at(i);
+        for (int j = 0; j < planedExec; j++) {
             chrono::time_point<chrono::system_clock> timeTo = j * tsk->getInterval() + now + delayBetweenTasks * i;
             if (tsk->getIsNeverEnding() || tsk->getEndTime() > timeTo)
-                this->shList.add(tsk, timeTo);
+                shList.add(tsk, timeTo);
         }
     }
 }
 
 void Sheduler::runLoop() {
     chrono::time_point<chrono::system_clock> thisTime;
-    thisTime = this->shList.getExecTime();
+    thisTime = shList.getExecTime();
     //There no destructing interval, but nie uwzględnia delays.
 
     now = std::chrono::system_clock::now();
-    this->shList.addActual();
+    shList.addActual();
 
-    if (this->shList.nextIsExisting()) {
+    if (shList.nextIsExisting()) {
         //Check is delay act on next task
-        if (this->shList.getNextExecTime() <= now) {
+        if (shList.getNextExecTime() <= now) {
             //Checking skipping is allowed
-            if (this->shList.getTask()->getCanSkipped()) {
+            if (shList.getTask()->getCanSkipped()) {
                 //Check can be skipp
-                if (this->shList.nextIsTheSame()) {
-                    this->shList.next();
+                if (shList.nextIsTheSame()) {
+                    shList.next();
                 } else {
-                    this->executeTask();
+                    executeTask();
                 }
             } else {
-                this->executeTask();
+                executeTask();
             }
             //Check delay actual task
         } else if (thisTime <= now) {
-            this->executeTask();
+            executeTask();
         } else {
             slept = calcSleepTime(thisTime);
             this_thread::sleep_for(slept);
-            this->executeTask();
+            executeTask();
         }
     } else {
         //Execute last job
@@ -133,14 +131,14 @@ void Sheduler::runLoop() {
             slept = calcSleepTime(thisTime);
             this_thread::sleep_for(slept);
         }
-        this->executeTask();
+        executeTask();
     }
 }
 
 void Sheduler::executeTask() {
     Task *tsk = this->shList.getTask();
     tsk->execute();
-    this->shList.next();
+    shList.next();
 }
 
 chrono::milliseconds Sheduler::calcSleepTime(chrono::time_point<chrono::system_clock> execTime) {
