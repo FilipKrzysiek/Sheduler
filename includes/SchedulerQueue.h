@@ -1,6 +1,8 @@
 #ifndef SHEDULERLIST_H
 
+#include <iostream>
 #include <string>
+#include "Task.h"
 
 using namespace std;
 #define SHEDULERLIST_H
@@ -99,7 +101,7 @@ public:
     /**
      * Remove all tasks from queue.
      */
-     void clearQueue();
+    void clearQueue();
 
 protected:
 

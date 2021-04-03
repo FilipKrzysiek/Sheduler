@@ -181,7 +181,7 @@ void SchedulerQueue::addActual() {
 
 void SchedulerQueue::clearQueue() {
     waitTask *wTaskTemp;
-    while(wTaskActual != nullptr){
+    while (wTaskActual != nullptr) {
         wTaskTemp = wTaskActual;
         wTaskActual = wTaskActual->next;
         delete wTaskTemp;
@@ -192,8 +192,8 @@ void SchedulerQueue::clearQueue() {
 bool SchedulerQueue::nextThisTaskIsExisting() {
     waitTask *temp;
     temp = wTaskActual;
-    while(temp != nullptr){
-        if(temp->task->getId() == wTaskActual->task->getId()){
+    while (temp != nullptr) {
+        if (temp->task->getId() == wTaskActual->task->getId()) {
             return true;
         }
         temp = temp->next;
@@ -204,8 +204,8 @@ bool SchedulerQueue::nextThisTaskIsExisting() {
 chrono::time_point<chrono::system_clock> SchedulerQueue::getNextThisTaskExecTime() {
     waitTask *temp;
     temp = wTaskActual;
-    while(temp != nullptr){
-        if(temp->task->getId() == wTaskActual->task->getId()){
+    while (temp != nullptr) {
+        if (temp->task->getId() == wTaskActual->task->getId()) {
             return temp->timeExec;
         }
         temp = temp->next;

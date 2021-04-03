@@ -1,6 +1,9 @@
 #ifndef TASKFUNCTION_H
 #define TASKFUNCTION_H
 
+#include <chrono>
+#include "Task.h"
+
 using namespace std::chrono_literals;
 
 

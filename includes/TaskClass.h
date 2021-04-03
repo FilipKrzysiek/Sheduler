@@ -4,6 +4,12 @@
 
 #ifndef TASKCLASSIF_H
 #define TASKCLASSIF_H
+
+#include <chrono>
+#include "TaskClassInterface.h"
+#include "Task.h"
+
+
 using namespace std::chrono_literals;
 
 
@@ -27,8 +33,9 @@ public:
      * @param clss address to class which will have method execute (extended by TaskClassInterface) to execute task
      * @param skipOtherTasks true - other repeatable task will be skipped, when this task work, false - other task wait to end work this task
      */
-    TaskClass(unsigned int id, std::chrono::time_point<std::chrono::system_clock> executeTime, TaskClassInterface *clss,
-                 bool skipOtherTasks = true);
+    TaskClass(unsigned int id, std::chrono::time_point<std::chrono::system_clock> executeTime,
+              TaskClassInterface *clss,
+              bool skipOtherTasks = true);
 
     virtual ~TaskClass() {};
 

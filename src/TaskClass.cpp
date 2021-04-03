@@ -13,7 +13,7 @@ TaskClass::TaskClass(unsigned int id, std::chrono::seconds interval, TaskClassIn
     if (endAfter > 0s) {
         this->endWorkTime = std::chrono::system_clock::now() + endAfter;
         this->isNeverEnding = false;
-    } else if(endAfter == 0s){
+    } else if (endAfter == 0s) {
         this->isNeverEnding = true;
     } else {
         throw Exception("Passed endAfter less than 0");

@@ -1,8 +1,9 @@
 #include "../includes/Scheduler.h"
-#include "../includes/TaskRepeatable.h"
+
 
 using namespace std;
 
+//TODO delete ended task from list
 //TODO task adaptative (calc time from end last task)
 
 Scheduler::Scheduler() {
@@ -388,7 +389,7 @@ chrono::milliseconds Scheduler::calcSleepTime() {
     chrono::milliseconds sleepTime = chrono::duration_cast<chrono::milliseconds>(execTime - now);
     if (sleepTime > maxTimeGap || sleepTime < -6h) {
         throw Exception("Error calculating sleep time! Sleep time: " + to_string(sleepTime.count()) +
-                " ms (max time gap" + to_string(maxTimeGap.count()) + " s, max accepted delay -6h)");
+                        " ms (max time gap" + to_string(maxTimeGap.count()) + " s, max accepted delay -6h)");
     } else if (sleepTime < 0ms)
         sleepTime = 0ms;
 

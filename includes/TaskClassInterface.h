@@ -5,7 +5,7 @@
 #ifndef LOGLIB_TASKCLASSINTERFACE_H
 #define LOGLIB_TASKCLASSINTERFACE_H
 
-class TaskClassInterface{
+class TaskClassInterface {
 public:
     /**
      * @brief Execute class method

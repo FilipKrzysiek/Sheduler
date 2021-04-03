@@ -1,6 +1,8 @@
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
+
 #include <vector>
 #include <string>
-#include <iostream>
 #include <chrono>
 
 using namespace std;
@@ -498,3 +500,4 @@ private:
     chrono::milliseconds getSleept();
 };
 
+#endif // SCHEDULER_H

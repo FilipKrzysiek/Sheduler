@@ -9,9 +9,10 @@
 
 class TaskRepeatable {
 public:
-    TaskRepeatable(){};
+    TaskRepeatable() {};
 
-    virtual ~TaskRepeatable(){};
+    virtual ~TaskRepeatable() {};
+
     /**
      * Check task can be skipped.
      * Only for repeatable task.

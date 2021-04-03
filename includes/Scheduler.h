@@ -1,4 +1,5 @@
-#ifndef SHEDULER_H
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
 #include <vector>
 #include <string>
@@ -6,16 +7,14 @@
 #include <chrono>
 #include <thread>
 #include "TaskClassInterface.h"
+#include "TaskClass.h"
+#include "TaskFunction.h"
 #include "Exception.h"
-#include "../src/Task.cpp"
-#include "../src/TaskFunction.cpp"
-#include "../src/TaskClass.cpp"
-#include "../src/SchedulerQueue.cpp"
+#include "SchedulerQueue.h"
 
 using namespace std;
 using namespace std::chrono_literals;
-using system_clock_time  = chrono::time_point<chrono::system_clock>;
-#define SHEDULER_H
+using system_clock_time = chrono::time_point<chrono::system_clock>;
 
 
 class Scheduler {
@@ -215,4 +214,4 @@ private:
     chrono::milliseconds getSleept();
 };
 
-#endif // SHEDULER_H
+#endif // SCHEDULER_H

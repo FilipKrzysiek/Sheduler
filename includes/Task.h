@@ -3,8 +3,9 @@
 
 #include "TaskStaticTime.h"
 #include "TaskRepeatable.h"
+#include "Exception.h"
 
-class Task: public TaskRepeatable, public TaskStaticTime {
+class Task : public TaskRepeatable, public TaskStaticTime {
 public:
     //Task(unsigned int id, unsigned int interval, void (*execFun)(), bool canSkipped, unsigned int endAfter){};
     //virtual Task(unsigned int interval, string execString, bool canSkipped = true, unsigned int endAfter = 0);
