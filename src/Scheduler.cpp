@@ -18,6 +18,8 @@ Scheduler::Scheduler(chrono::minutes endAfterMinutes) {
 }
 
 Scheduler::~Scheduler() {
+    flgEndTaskCollector = true;
+    taskCollector.join();
     for (auto tsk : repeatableTaskList) {
         delete tsk;
     }
@@ -27,32 +29,33 @@ Scheduler::~Scheduler() {
     }
 }
 
-void Scheduler::addNewTask(chrono::seconds interval, void (*execFun)(), bool canSkipped, chrono::seconds endAfter) {
-    //Task *newTask = new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter);
-    repeatableTaskList.push_back(new TaskFunction(taskId, interval, execFun, canSkipped, endAfter));
-    taskId++;
-}
-
-void Scheduler::addNewTask(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped,
+void Scheduler::addNewTask(chrono::seconds interval, void (*execFun)(), bool canSkipped, bool isBlocking,
                            chrono::seconds endAfter) {
     //Task *newTask = new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter);
-    repeatableTaskList.push_back(new TaskClass(taskId, interval, clss, canSkipped, endAfter));
+    repeatableTaskList.push_back(new TaskFunction(taskId, interval, execFun, canSkipped, isBlocking, false, endAfter));
     taskId++;
 }
 
-void Scheduler::addNewTaskCallingAt(system_clock_time timeToExecute, void (*execFun)(),
-                                    bool skippOtherTasks) {
-    staticTimeTaskList.push_back(
-            new TaskFunction(taskId, calculateExecuteTime(timeToExecute), execFun, skippOtherTasks));
+void Scheduler::addNewTask(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped, bool isBlocking,
+                           chrono::seconds endAfter) {
+    //Task *newTask = new TaskFunction(this->taskId, interval, execFun, canSkipped, endAfter);
+    repeatableTaskList.push_back(new TaskClass(taskId, interval, clss, canSkipped, isBlocking, false, endAfter));
     taskId++;
 }
 
-void Scheduler::addNewTaskCallingAt(time_t timeToExecute, void (*execFun)(), bool skippOtherTasks) {
-    addNewTaskCallingAt(chrono::system_clock::from_time_t(timeToExecute), execFun, skippOtherTasks);
+void Scheduler::addNewTaskCallingAt(system_clock_time timeToExecute, void (*execFun)(), bool skippOtherTasks,
+                                    bool isBlocking) {
+    staticTimeTaskList.push_back(new TaskFunction(taskId, calculateExecuteTime(timeToExecute), execFun,
+                                                  skippOtherTasks, isBlocking, false));
+    taskId++;
+}
+
+void Scheduler::addNewTaskCallingAt(time_t timeToExecute, void (*execFun)(), bool skippOtherTasks, bool isBlocking) {
+    addNewTaskCallingAt(chrono::system_clock::from_time_t(timeToExecute), execFun, skippOtherTasks, isBlocking);
 }
 
 void Scheduler::addNewTaskCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
-                                    void (*execFun)(), bool skippOtherTasks) {
+                                    void (*execFun)(), bool skippOtherTasks, bool isBlocking) {
     if (!checkCorrectTime(hour, minute, second))
         throw Exception("Passed time to create task AT is incorrect");
 
@@ -60,21 +63,23 @@ void Scheduler::addNewTaskCallingAt(unsigned short hour, unsigned short minute, 
     time(&nowTimeT);
 
     nowTimeT = calculateEndTime(nowTimeT, hour, minute, second);
-    addNewTaskCallingAt(nowTimeT, execFun, skippOtherTasks);
+    addNewTaskCallingAt(nowTimeT, execFun, skippOtherTasks, isBlocking);
 }
 
-void Scheduler::addNewTaskCallingAt(system_clock_time timeToExecute, TaskClassInterface *clss,
-                                    bool skippOtherTasks) {
-    staticTimeTaskList.push_back(new TaskClass(taskId, calculateExecuteTime(timeToExecute), clss, skippOtherTasks));
+void Scheduler::addNewTaskCallingAt(system_clock_time timeToExecute, TaskClassInterface *clss, bool skippOtherTasks,
+                                    bool isBlocking) {
+    staticTimeTaskList.push_back(new TaskClass(taskId, calculateExecuteTime(timeToExecute), clss,
+                                               skippOtherTasks, isBlocking, false));
     taskId++;
 }
 
-void Scheduler::addNewTaskCallingAt(time_t timeToExecute, TaskClassInterface *clss, bool skippOtherTasks) {
-    addNewTaskCallingAt(chrono::system_clock::from_time_t(timeToExecute), clss, skippOtherTasks);
+void Scheduler::addNewTaskCallingAt(time_t timeToExecute, TaskClassInterface *clss, bool skippOtherTasks,
+                                    bool isBlocking) {
+    addNewTaskCallingAt(chrono::system_clock::from_time_t(timeToExecute), clss, skippOtherTasks, isBlocking);
 }
 
 void Scheduler::addNewTaskCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
-                                    TaskClassInterface *clss, bool skippOtherTasks) {
+                                    TaskClassInterface *clss, bool skippOtherTasks, bool isBlocking) {
     if (!checkCorrectTime(hour, minute, second))
         throw Exception("Passed time to create task AT is incorrect");
 
@@ -82,7 +87,70 @@ void Scheduler::addNewTaskCallingAt(unsigned short hour, unsigned short minute, 
     time(&nowTimeT);
 
     nowTimeT = calculateEndTime(nowTimeT, hour, minute, second);
-    addNewTaskCallingAt(nowTimeT, clss, skippOtherTasks);
+    addNewTaskCallingAt(nowTimeT, clss, skippOtherTasks, isBlocking);
+}
+
+
+
+void Scheduler::addNewTaskOnThread(chrono::seconds interval, void (*execFun)(), bool canSkipped, bool isBlocking,
+                                   chrono::seconds endAfter) {
+    repeatableTaskList.push_back(new TaskFunction(taskId, interval, execFun, canSkipped, isBlocking, true, endAfter));
+    taskId++;
+}
+
+void Scheduler::addNewTaskOnThead(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped, bool isBlocking,
+                                  chrono::seconds endAfter) {
+    repeatableTaskList.push_back(new TaskClass(taskId, interval, clss, canSkipped, isBlocking, true, endAfter));
+    taskId++;
+}
+
+void Scheduler::addNewTaskOnThreadCallingAt(system_clock_time timeToExecute, void (*execFun)(), bool skippOtherTasks,
+                                            bool isBlocking) {
+    staticTimeTaskList.push_back(new TaskFunction(taskId, calculateExecuteTime(timeToExecute), execFun,
+                                                  skippOtherTasks, isBlocking, true));
+    taskId++;
+}
+
+void
+Scheduler::addNewTaskOnThreadCallingAt(system_clock_time timeToExecute, TaskClassInterface *clss, bool skippOtherTasks,
+                                       bool isBlocking) {
+    staticTimeTaskList.push_back(new TaskClass(taskId, calculateExecuteTime(timeToExecute), clss,
+                                               skippOtherTasks, isBlocking, true));
+    taskId++;
+}
+
+void
+Scheduler::addNewTaskOnThreadCallingAt(time_t timeToExecute, void (*execFun)(), bool skippOtherTasks, bool isBlocking) {
+    addNewTaskOnThreadCallingAt(chrono::system_clock::from_time_t(timeToExecute), execFun, skippOtherTasks, isBlocking);
+}
+
+void Scheduler::addNewTaskOnThreadCallingAt(time_t timeToExecute, TaskClassInterface *clss, bool skippOtherTasks,
+                                            bool isBlocking) {
+    addNewTaskOnThreadCallingAt(chrono::system_clock::from_time_t(timeToExecute), clss, skippOtherTasks, isBlocking);
+}
+
+void Scheduler::addNewTaskOnThreadCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
+                                            void (*execFun)(), bool skippOtherTasks, bool isBlocking) {
+    if (!checkCorrectTime(hour, minute, second))
+        throw Exception("Passed time to create task AT is incorrect");
+
+    time_t nowTimeT;
+    time(&nowTimeT);
+
+    nowTimeT = calculateEndTime(nowTimeT, hour, minute, second);
+    addNewTaskCallingAt(nowTimeT, execFun, skippOtherTasks, isBlocking);
+}
+
+void Scheduler::addNewTaskOnThreadCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
+                                            TaskClassInterface *clss, bool skippOtherTasks, bool isBlocking) {
+    if (!checkCorrectTime(hour, minute, second))
+        throw Exception("Passed time to create task AT is incorrect");
+
+    time_t nowTimeT;
+    time(&nowTimeT);
+
+    nowTimeT = calculateEndTime(nowTimeT, hour, minute, second);
+    addNewTaskCallingAt(nowTimeT, clss, skippOtherTasks, isBlocking);
 }
 
 void Scheduler::setEndWorkTimeAfter(chrono::minutes minutes) {
@@ -236,8 +304,7 @@ void Scheduler::run() {
     this->prepareRun();
     if (!flgEndWorkTimeEnabled) {
         while (true) {
-            if ((!schedulerQueueRepeatable.isExisting() && flgEndWhenRepeatableEnd) ||
-                (!schedulerQueueRepeatable.isExisting() && !schedulerQueueStaticTime.isExisting())) {
+            if (checkEndLoop(&schedulerQueueRepeatable, &schedulerQueueStaticTime)) {
                 break;
             } else {
                 runLoop();
@@ -248,14 +315,18 @@ void Scheduler::run() {
 //             << endl;
         while (now < this->endWorkingTime) {
             //this->schedulerQueueRepeatable.printTasksId();
-            if ((!schedulerQueueRepeatable.isExisting() && flgEndWhenRepeatableEnd) ||
-                (!schedulerQueueRepeatable.isExisting() && !schedulerQueueStaticTime.isExisting())) {
+            if (checkEndLoop(&schedulerQueueRepeatable, &schedulerQueueStaticTime)) {
                 break;
             } else {
                 runLoop();
             }
         }
     }
+}
+
+inline bool Scheduler::checkEndLoop(SchedulerQueue *repeatable, SchedulerQueue *staticTime) {
+    return (!repeatable->isExisting() && flgEndWhenRepeatableEnd) ||
+           (!repeatable->isExisting() && !staticTime->isExisting());
 }
 
 void Scheduler::prepareRun() {
@@ -269,6 +340,8 @@ void Scheduler::prepareRun() {
 
     prepareRunRepeatable();
     prepareRunStaticTime();
+
+    taskCollector = thread(&Scheduler::taskCollectorFunction, this);
 }
 
 void Scheduler::prepareRunRepeatable() {
@@ -313,7 +386,7 @@ bool Scheduler::runStaticTime() {
             tsk->incrementStaticExecuteTime();
             schedulerQueueStaticTime.addTask(tsk, tsk->getStaticExecuteTime());
 
-            tsk->execute();
+            executeTask(tsk);
 
             if (tsk->getSkipOtherTasks()) {
                 schedulerQueueRepeatable.clearQueue();
@@ -346,8 +419,8 @@ void Scheduler::runRepeatable() {
     }
 }
 
-// Skiping if next is the same (change pointer in queue)
-// Skiping if next execute of this task have time lower than now
+// Skipping if next is the same (change pointer in queue)
+// Skipping if next execute of this task have time lower than now
 void Scheduler::skippingTasks() {
     if (schedulerQueueRepeatable.nextIsTheSame()) {
         schedulerQueueRepeatable.next();
@@ -356,6 +429,7 @@ void Scheduler::skippingTasks() {
             if (now - schedulerQueueRepeatable.getNextThisTaskExecTime() < 0s) {
                 executeRepeatableTask();
             } else {
+                //TODO analyze starve process
                 schedulerQueueRepeatable.next();
             }
         } else {
@@ -365,8 +439,28 @@ void Scheduler::skippingTasks() {
 }
 
 void Scheduler::executeRepeatableTask() {
-    this->schedulerQueueRepeatable.getTask()->execute();
+    executeTask(this->schedulerQueueRepeatable.getTask());
     this->schedulerQueueRepeatable.next();
+}
+
+void Scheduler::executeTask(Task *task) {
+    if (task->isBlocking()) {
+        while (!runningTaskOnThread.empty()) {
+            this_thread::sleep_for(waitForEndTaskOnThreadTime);
+        }
+        task->execute();
+    } else {
+        if (task->isRunOnThread()) {
+            while (thisTaskIsRunning(task->getId())) {
+                this_thread::sleep_for(waitForEndTaskOnThreadTime);
+            }
+            runningTaskOnThreadLocker.lock();
+            runningTaskOnThread.push_back(new TaskOnThread(task));
+            runningTaskOnThreadLocker.unlock();
+        } else {
+            task->execute();
+        }
+    }
 }
 
 chrono::milliseconds Scheduler::calcSleepTime() {
@@ -396,4 +490,53 @@ chrono::milliseconds Scheduler::calcSleepTime() {
     return sleepTime;
 }
 
+bool Scheduler::thisTaskIsRunning(unsigned int id) {
+    for (auto &row : runningTaskOnThread) {
+        if (row->getTaskId() == id) {
+            return true;
+        }
+    }
+    return false;
+}
 
+void Scheduler::taskCollectorFunction() {
+    while (!flgEndTaskCollector) {
+        this_thread::sleep_for(waitForEndTaskOnThreadTime);
+        for (int i = 0; i < runningTaskOnThread.size(); ++i) {
+            if (runningTaskOnThread[i]->taskEnd()) {
+                TaskOnThread *temp;
+                runningTaskOnThreadLocker.lock();
+                temp = runningTaskOnThread[i];
+                runningTaskOnThread.erase(runningTaskOnThread.begin() + i);
+                runningTaskOnThreadLocker.unlock();
+                delete temp;
+                --i;
+            }
+        }
+    }
+}
+
+
+Scheduler::TaskOnThread::TaskOnThread(Task *task) {
+    this->task = task;
+    th = thread(&Scheduler::TaskOnThread::threadTask, this);
+
+}
+
+void Scheduler::TaskOnThread::threadTask() {
+    task->execute();
+    working = false;
+}
+
+bool Scheduler::TaskOnThread::taskEnd() {
+    return !working;
+}
+
+Scheduler::TaskOnThread::~TaskOnThread() {
+    if(th.joinable())
+        th.join();
+}
+
+unsigned int Scheduler::TaskOnThread::getTaskId() {
+    return task->getId();
+}

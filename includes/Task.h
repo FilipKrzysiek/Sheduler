@@ -9,7 +9,7 @@ class Task : public TaskRepeatable, public TaskStaticTime {
 public:
     //Task(unsigned int id, unsigned int interval, void (*execFun)(), bool canSkipped, unsigned int endAfter){};
     //virtual Task(unsigned int interval, string execString, bool canSkipped = true, unsigned int endAfter = 0);
-    Task() {};
+    Task(const bool runOnThread) : runOnThread(runOnThread){};
 
     virtual ~Task() {};
 
@@ -30,9 +30,19 @@ public:
      */
     unsigned int getId();
 
+    /**
+     * Check task is blocking, must wait to end other tasks running on other threads.
+     * @return true - task must wait to end all other tasks; false - task don't wait for other tasks
+     */
+    bool isBlocking() const;
+
+    bool isRunOnThread();
+
 protected:
     unsigned int id;
     std::chrono::time_point<std::chrono::system_clock> lastExecute;
+    bool blocking;
+    const bool runOnThread;
 
 };
 

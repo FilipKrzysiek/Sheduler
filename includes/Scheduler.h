@@ -6,6 +6,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <future>
 #include "TaskClassInterface.h"
 #include "TaskClass.h"
 #include "TaskFunction.h"
@@ -35,18 +36,21 @@ public:
      * @param interval Interval of calling passed function.
      * @param execFun Address for function to call (execute).
      * @param canSkipped Call can be skipped when is delayed.
+     * @param isBlocking if true all tasks run on thread must end before start this task.
      * @param endAfter Ending after seconds. If 0 never ending.
      */
-    void addNewTask(chrono::seconds interval, void (*execFun)(), bool canSkipped = true, chrono::seconds endAfter = 0s);
+    void addNewTask(chrono::seconds interval, void (*execFun)(), bool canSkipped = true, bool isBlocking = false,
+                    chrono::seconds endAfter = 0s);
 
     /**
      * Adding new task to que.
      * @param interval Interval of calling passed function.
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
      * @param canSkipped Call can be skipped when is delayed.
+     * @param isBlocking if true all tasks run on thread must end before start this task.
      * @param endAfter Ending after seconds. If 0 never ending.
      */
-    void addNewTask(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped = true,
+    void addNewTask(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped = true, bool isBlocking = false,
                     chrono::seconds endAfter = 0s);
 
 
@@ -55,32 +59,40 @@ public:
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param execFun Address for function to call (execute).
      * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
      */
-    void addNewTaskCallingAt(system_clock_time timeToExecute, void (*execFun)(), bool skippOtherTasks = true);
+    void addNewTaskCallingAt(system_clock_time timeToExecute, void (*execFun)(), bool skippOtherTasks = true,
+                             bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
      * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
      */
-    void addNewTaskCallingAt(system_clock_time timeToExecute, TaskClassInterface *clss, bool skippOtherTasks = true);
+    void addNewTaskCallingAt(system_clock_time timeToExecute, TaskClassInterface *clss, bool skippOtherTasks = true,
+                             bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param execFun Address for function to call (execute).
      * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
      */
-    void addNewTaskCallingAt(time_t timeToExecute, void (*execFun)(), bool skippOtherTasks = true);
+    void addNewTaskCallingAt(time_t timeToExecute, void (*execFun)(), bool skippOtherTasks = true,
+                             bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
      * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
      */
-    void addNewTaskCallingAt(time_t timeToExecute, TaskClassInterface *clss, bool skippOtherTasks = true);
+    void addNewTaskCallingAt(time_t timeToExecute, TaskClassInterface *clss, bool skippOtherTasks = true,
+                             bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
@@ -89,9 +101,10 @@ public:
      * @param second Second when task must be executed.
      * @param execFun Address for function to call (execute).
      * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
      */
     void addNewTaskCallingAt(unsigned short hour, unsigned short minute, unsigned short second, void (*execFun)(),
-                             bool skippOtherTasks = true);
+                             bool skippOtherTasks = true, bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
@@ -100,9 +113,97 @@ public:
      * @param second Second when task must be executed.
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
      * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
      */
     void addNewTaskCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
-                             TaskClassInterface *clss, bool skippOtherTasks = true);
+                             TaskClassInterface *clss, bool skippOtherTasks = true, bool isBlocking = false);
+
+    /**
+     * Adding new task running on thread to que.
+     * @param interval Interval of calling passed function.
+     * @param execFun Address for function to call (execute).
+     * @param canSkipped Call can be skipped when is delayed.
+     * @param isBlocking if true all tasks run on thread must end before start this task.
+     * @param endAfter Ending after seconds. If 0 never ending.
+     */
+    void addNewTaskOnThread(chrono::seconds interval, void (*execFun)(), bool canSkipped = true,
+                            bool isBlocking = false, chrono::seconds endAfter = 0s);
+
+    /**
+     * Adding new task running on thread to que.
+     * @param interval Interval of calling passed function.
+     * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
+     * @param canSkipped Call can be skipped when is delayed.
+     * @param isBlocking if true all tasks run on thread must end before start this task.
+     * @param endAfter Ending after seconds. If 0 never ending.
+     */
+    void addNewTaskOnThead(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped = true,
+                           bool isBlocking = false, chrono::seconds endAfter = 0s);
+
+
+    /**
+     * Add new task executing addTask running on thread on specific time
+     * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
+     * @param execFun Address for function to call (execute).
+     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
+     */
+    void addNewTaskOnThreadCallingAt(system_clock_time timeToExecute, void (*execFun)(), bool skippOtherTasks = true,
+                                     bool isBlocking = false);
+
+    /**
+     * Add new task executing addTask running on thread on specific time
+     * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
+     * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
+     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
+     */
+    void addNewTaskOnThreadCallingAt(system_clock_time timeToExecute, TaskClassInterface *clss,
+                                     bool skippOtherTasks = true, bool isBlocking = false);
+
+    /**
+     * Add new task executing addTask running on thread on specific time
+     * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
+     * @param execFun Address for function to call (execute).
+     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
+     */
+    void addNewTaskOnThreadCallingAt(time_t timeToExecute, void (*execFun)(), bool skippOtherTasks = true,
+                                     bool isBlocking = false);
+
+    /**
+     * Add new task executing addTask running on thread on specific time
+     * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
+     * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
+     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
+     */
+    void addNewTaskOnThreadCallingAt(time_t timeToExecute, TaskClassInterface *clss, bool skippOtherTasks = true,
+                                     bool isBlocking = false);
+
+    /**
+     * Add new task executing addTask running on thread on specific time
+     * @param hour Hour when task must be executed.
+     * @param minute Minute when task must be executed.
+     * @param second Second when task must be executed.
+     * @param execFun Address for function to call (execute).
+     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
+     */
+    void addNewTaskOnThreadCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
+                                     void (*execFun)(), bool skippOtherTasks = true, bool isBlocking = false);
+
+    /**
+     * Add new task executing addTask running on thread on specific time
+     * @param hour Hour when task must be executed.
+     * @param minute Minute when task must be executed.
+     * @param second Second when task must be executed.
+     * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
+     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
+     * @param isBlocking if true all tasks run on thread must end before start this task.
+     */
+    void addNewTaskOnThreadCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
+                                     TaskClassInterface *clss, bool skippOtherTasks = true, bool isBlocking = false);
 
 
     /**
@@ -164,17 +265,36 @@ public:
     void run();
 
 private:
+    class TaskOnThread {
+    public:
+        TaskOnThread(Task *task);
+        virtual ~TaskOnThread();
+        bool taskEnd();
+        unsigned int getTaskId();
+    private:
+        thread th;
+        bool working = true;
+        Task *task;
+        void threadTask();
+    };
+
     //time_t endWorkingTime, now, slept, maxTimeGap = 1000 * 60 * 10;
     system_clock_time endWorkingTime, now;
     chrono::milliseconds slept = 0ms, delayBetweenTasks = 1s;
     chrono::seconds maxTimeGap = 24h + 1min;
+    const chrono::milliseconds waitForEndTaskOnThreadTime =  5ms;
     vector<Task *> repeatableTaskList;
     vector<Task *> staticTimeTaskList;
+    vector<TaskOnThread *> runningTaskOnThread;
     SchedulerQueue schedulerQueueRepeatable, schedulerQueueStaticTime;
     unsigned int taskId;
     unsigned int planedExec;
+    thread taskCollector;
+    mutex runningTaskOnThreadLocker;
     bool flgEndWorkTimeEnabled = false;
     bool flgEndWhenRepeatableEnd = true;
+    bool flgIsAnyTaskOnThread = false;
+    bool flgEndTaskCollector = false;
 
     /**
      *
@@ -199,9 +319,13 @@ private:
 
     void executeRepeatableTask();
 
+    void executeTask(Task *task);
+
     bool checkCorrectTime(unsigned short hour, unsigned short minute, unsigned short second);
 
     bool checkCorrectDate(unsigned short year, unsigned short month, unsigned short day);
+
+    inline bool checkEndLoop(SchedulerQueue *repeatable, SchedulerQueue *staticTime);
 
     time_t calculateEndTime(time_t base, unsigned short hour, unsigned short minute, unsigned short second);
 
@@ -212,6 +336,10 @@ private:
     string getTaskTimeList();
 
     chrono::milliseconds getSleept();
+
+    bool thisTaskIsRunning(unsigned int id);
+
+    void taskCollectorFunction();
 };
 
 #endif // SCHEDULER_H

@@ -7,6 +7,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Scheduler/resources)
 #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
 #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Scheduler/resources)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 include_directories(includes)
 
 add_library(Scheduler STATIC
@@ -27,6 +30,10 @@ add_library(SchedulerShared SHARED
         src/Task.cpp
         src/TaskClass.cpp
         src/TaskFunction.cpp)
+
+target_link_libraries(Scheduler PRIVATE Threads::Threads)
+target_link_libraries(SchedulerShared PRIVATE Threads::Threads)
+
 
 set_target_properties(Scheduler PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Scheduler/resources)
 set_target_properties(SchedulerShared PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Scheduler/resources)
