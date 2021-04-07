@@ -1,8 +1,7 @@
 #include "../includes/TaskFunction.h"
 
 TaskFunction::TaskFunction(unsigned int id, std::chrono::seconds interval, void (*execFun)(), bool canSkipped,
-                           bool isBlocking,
-                           bool runOnThread, std::chrono::seconds endAfter) : Task(runOnThread) {
+                           bool isBlocking, bool runOnThread, std::chrono::seconds endAfter) : Task(runOnThread) {
     this->id = id;
     this->interval = interval;
     this->execFun = execFun;
@@ -19,8 +18,8 @@ TaskFunction::TaskFunction(unsigned int id, std::chrono::seconds interval, void 
 }
 
 TaskFunction::TaskFunction(unsigned int id, std::chrono::time_point<std::chrono::system_clock> executeTime,
-                           void (*execFun)(),
-                           bool skipOtherTasks, bool isBlocking, bool runOnThread) : Task(runOnThread)  {
+                           void (*execFun)(), bool skipOtherTasks, bool isBlocking, bool runOnThread)
+        : Task(runOnThread) {
     this->id = id;
     this->staticExecuteTime = executeTime;
     this->execFun = execFun;

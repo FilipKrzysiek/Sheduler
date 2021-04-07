@@ -19,7 +19,8 @@ Scheduler::Scheduler(chrono::minutes endAfterMinutes) {
 
 Scheduler::~Scheduler() {
     flgEndTaskCollector = true;
-    taskCollector.join();
+    if (taskCollector.joinable())
+        taskCollector.join();
     for (auto tsk : repeatableTaskList) {
         delete tsk;
     }
@@ -91,7 +92,6 @@ void Scheduler::addNewTaskCallingAt(unsigned short hour, unsigned short minute, 
 }
 
 
-
 void Scheduler::addNewTaskOnThread(chrono::seconds interval, void (*execFun)(), bool canSkipped, bool isBlocking,
                                    chrono::seconds endAfter) {
     repeatableTaskList.push_back(new TaskFunction(taskId, interval, execFun, canSkipped, isBlocking, true, endAfter));
@@ -138,7 +138,7 @@ void Scheduler::addNewTaskOnThreadCallingAt(unsigned short hour, unsigned short 
     time(&nowTimeT);
 
     nowTimeT = calculateEndTime(nowTimeT, hour, minute, second);
-    addNewTaskCallingAt(nowTimeT, execFun, skippOtherTasks, isBlocking);
+    addNewTaskOnThreadCallingAt(nowTimeT, execFun, skippOtherTasks, isBlocking);
 }
 
 void Scheduler::addNewTaskOnThreadCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
@@ -150,7 +150,7 @@ void Scheduler::addNewTaskOnThreadCallingAt(unsigned short hour, unsigned short 
     time(&nowTimeT);
 
     nowTimeT = calculateEndTime(nowTimeT, hour, minute, second);
-    addNewTaskCallingAt(nowTimeT, clss, skippOtherTasks, isBlocking);
+    addNewTaskOnThreadCallingAt(nowTimeT, clss, skippOtherTasks, isBlocking);
 }
 
 void Scheduler::setEndWorkTimeAfter(chrono::minutes minutes) {
@@ -501,7 +501,8 @@ bool Scheduler::thisTaskIsRunning(unsigned int id) {
 
 void Scheduler::taskCollectorFunction() {
     while (!flgEndTaskCollector) {
-        this_thread::sleep_for(waitForEndTaskOnThreadTime);
+        this_thread::sleep_for(
+                waitForEndTaskOnThreadTime + waitForEndTaskOnThreadTime * 100 * runningTaskOnThread.empty());
         for (int i = 0; i < runningTaskOnThread.size(); ++i) {
             if (runningTaskOnThread[i]->taskEnd()) {
                 TaskOnThread *temp;
@@ -533,7 +534,7 @@ bool Scheduler::TaskOnThread::taskEnd() {
 }
 
 Scheduler::TaskOnThread::~TaskOnThread() {
-    if(th.joinable())
+    if (th.joinable())
         th.join();
 }
 

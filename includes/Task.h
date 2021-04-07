@@ -9,7 +9,7 @@ class Task : public TaskRepeatable, public TaskStaticTime {
 public:
     //Task(unsigned int id, unsigned int interval, void (*execFun)(), bool canSkipped, unsigned int endAfter){};
     //virtual Task(unsigned int interval, string execString, bool canSkipped = true, unsigned int endAfter = 0);
-    Task(const bool runOnThread) : runOnThread(runOnThread){};
+    Task(const bool runOnThread) : runOnThread(runOnThread) {};
 
     virtual ~Task() {};
 
@@ -36,6 +36,10 @@ public:
      */
     bool isBlocking() const;
 
+    /**
+     * Check task is run on master thread or on separate thread.
+     * @return true - task run on separate thread; false - task run on main thread
+     */
     bool isRunOnThread();
 
 protected:
