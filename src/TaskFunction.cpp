@@ -1,4 +1,4 @@
-#include "../includes/TaskFunction.h"
+#include "TaskFunction.h"
 
 TaskFunction::TaskFunction(unsigned int id, std::chrono::seconds interval, void (*execFun)(), bool canSkipped,
                            bool isBlocking, bool runOnThread, std::chrono::seconds endAfter) : Task(runOnThread) {

@@ -1,4 +1,4 @@
-#include "../includes/SchedulerQueue.h"
+#include "SchedulerQueue.h"
 
 SchedulerQueue::SchedulerQueue() {
     this->planedExec = 3;

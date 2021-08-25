@@ -2,7 +2,7 @@
 // Created by krzysiu on 12.05.2020.
 //
 
-#include "../includes/TaskRepeatable.h"
+#include "TaskRepeatable.h"
 
 std::chrono::time_point<std::chrono::system_clock> TaskRepeatable::getEndTime() {
     return this->endWorkTime;

@@ -1,4 +1,4 @@
-#include "../includes/Scheduler.h"
+#include "Scheduler.h"
 
 
 using namespace std;
@@ -98,7 +98,7 @@ void Scheduler::addNewTaskOnThread(chrono::seconds interval, void (*execFun)(), 
     taskId++;
 }
 
-void Scheduler::addNewTaskOnThead(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped, bool isBlocking,
+void Scheduler::addNewTaskOnThread(chrono::seconds interval, TaskClassInterface *clss, bool canSkipped, bool isBlocking,
                                   chrono::seconds endAfter) {
     repeatableTaskList.push_back(new TaskClass(taskId, interval, clss, canSkipped, isBlocking, true, endAfter));
     taskId++;

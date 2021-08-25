@@ -2,7 +2,7 @@
 // Created by krzysiu on 12.05.2020.
 //
 
-#include "../includes/TaskStaticTime.h"
+#include "TaskStaticTime.h"
 
 std::chrono::time_point<std::chrono::system_clock> TaskStaticTime::getStaticExecuteTime() {
     return staticExecuteTime;

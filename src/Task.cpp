@@ -1,4 +1,4 @@
-#include "../includes/Task.h"
+#include "Task.h"
 
 std::chrono::time_point<std::chrono::system_clock> Task::getLastExecute() {
     return this->lastExecute;

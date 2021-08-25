@@ -2,7 +2,7 @@
 // Created by krzysiu on 21.09.2019.
 //
 
-#include "../includes/TaskClass.h"
+#include "TaskClass.h"
 
 TaskClass::TaskClass(unsigned int id, std::chrono::seconds interval, TaskClassInterface *clss, bool canSkipped,
                      bool isBlocking, bool runOnThread, std::chrono::seconds endAfter) : Task(runOnThread)  {
