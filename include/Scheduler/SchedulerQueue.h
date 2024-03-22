@@ -11,7 +11,7 @@ class SchedulerQueue {
 public:
     SchedulerQueue();
 
-    SchedulerQueue(unsigned int planedExec);
+    explicit SchedulerQueue(unsigned int planedExec);
 
     virtual ~SchedulerQueue();
 
@@ -25,7 +25,7 @@ public:
      * Get actual task
      * @return
      */
-    Task *getTask();
+    TaskInterface *getTask();
 
     /**
      * Get execute time from actual task
@@ -80,7 +80,7 @@ public:
      * @param tsk address to task
      * @param timeExec time when task should be executed
      */
-    void addTask(Task *tsk, chrono::time_point<chrono::system_clock> timeExec);
+    void addTask(TaskInterface *tsk, chrono::time_point<chrono::system_clock> timeExec);
 
     /**
      * Print tasks id in queue
@@ -108,11 +108,11 @@ protected:
 private:
     class waitTask {
     public:
-        Task *task;
+        TaskInterface *task;
         chrono::time_point<chrono::system_clock> timeExec;
         waitTask *next = nullptr;
 
-        waitTask(Task *task, chrono::time_point<chrono::system_clock> timeExec, waitTask *next = nullptr) {
+        waitTask(TaskInterface *task, chrono::time_point<chrono::system_clock> timeExec, waitTask *next = nullptr) {
             this->task = task;
             this->timeExec = timeExec;
             this->next = next;

@@ -39,7 +39,7 @@ bool SchedulerQueue::next() {
     }
 }
 
-Task *SchedulerQueue::getTask() {
+TaskInterface *SchedulerQueue::getTask() {
     if (wTaskActual != nullptr)
         return wTaskActual->task;
     else
@@ -121,7 +121,7 @@ string SchedulerQueue::getTaskTimeList() {
     return txt;
 }
 
-void SchedulerQueue::addTask(Task *tsk, chrono::time_point<chrono::system_clock> timeExec) {
+void SchedulerQueue::addTask(TaskInterface *tsk, chrono::time_point<chrono::system_clock> timeExec) {
     if (isExisting()) {
         waitTask *iter = this->wTaskActual, *prev = nullptr;
 
@@ -154,7 +154,7 @@ void SchedulerQueue::addTask(Task *tsk, chrono::time_point<chrono::system_clock>
 }
 
 void SchedulerQueue::addActual() {
-    Task *tsk;
+    TaskInterface *tsk;
     tsk = this->getTask();
     chrono::time_point<chrono::system_clock> nextExecTime, now;
     now = chrono::system_clock::now();
