@@ -38,13 +38,6 @@ Scheduler::~Scheduler() {
     flgEndTaskCollector = true;
     if (taskCollector.joinable())
         taskCollector.join();
-    for (auto tsk: repeatableTaskList) {
-        delete tsk;
-    }
-
-    for (auto tsk: staticTimeTaskList) {
-        delete tsk;
-    }
 }
 
 void Scheduler::addNewTaskCallingAt(system_clock_time timeToExecute, void (*execFun)(), bool runOnThread,
@@ -235,7 +228,7 @@ void Scheduler::setEndWhenRepeatableEnd(bool flg) {
 }
 
 template<class Rep, class Period>
-void Scheduler::setDelayBetweenTasks(const chrono::duration<Rep, Period> time &delayBetweenTasks) {
+void Scheduler::setDelayBetweenTasks(const chrono::duration<Rep, Period> &delayBetweenTasks) {
     Scheduler::delayBetweenTasks = delayBetweenTasks;
 }
 
@@ -324,7 +317,7 @@ void Scheduler::runLoop() {
 bool Scheduler::runStaticTime() {
     if (schedulerQueueStaticTime.isExisting()) {
         if (now >= schedulerQueueStaticTime.getExecTime()) {
-            TaskStaticTime *tsk = schedulerQueueStaticTime.getTask();
+            TaskStaticTime *tsk = dynamic_cast<TaskStaticTime*>(schedulerQueueStaticTime.getTask());
             tsk->incrementStaticExecuteTime();
             schedulerQueueStaticTime.addTask(tsk, tsk->getStaticExecuteTime());
 
@@ -349,7 +342,7 @@ void Scheduler::runRepeatable() {
             if (now - schedulerQueueRepeatable.getExecTime() < 1s) {
                 executeRepeatableTask();
             } else {
-                if (schedulerQueueRepeatable.getTask()->getCanSkipped()) {
+                if (dynamic_cast<TaskRepeatable*>(schedulerQueueRepeatable.getTask())->getCanSkipped()) {
                     skippingTasks();
                 } else {
                     executeRepeatableTask();

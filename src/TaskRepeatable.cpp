@@ -5,9 +5,9 @@
 #include "TaskRepeatable.h"
 
 template<class Rep, class Period>
-TaskRepeatable::TaskRepeatable(TaskTypeInterface *task, unsigned int id, chrono::duration<Rep, Period> interval,
+TaskRepeatable::TaskRepeatable(TaskTypeInterface *task, unsigned int id, std::chrono::duration<Rep, Period> interval,
                                bool blocking, bool runOnThread, bool canBeSkipped,
-                               chrono::duration<Rep, Period> endAfter)
+                               std::chrono::duration<Rep, Period> endAfter)
     : TaskController(task, id, blocking, runOnThread), interval(interval), canBeSkipped(canBeSkipped) {
     if (endAfter > 0s) {
         this->endWorkTime = std::chrono::system_clock::now() + endAfter;
@@ -20,10 +20,10 @@ TaskRepeatable::TaskRepeatable(TaskTypeInterface *task, unsigned int id, chrono:
 }
 
 template<class Rep, class Period>
-TaskRepeatable::TaskRepeatable(unique_ptr<TaskTypeInterface> task, unsigned int id,
-                               chrono::duration<Rep, Period> interval, bool blocking, bool runOnThread,
+TaskRepeatable::TaskRepeatable(std::unique_ptr<TaskTypeInterface> task, unsigned int id,
+                               std::chrono::duration<Rep, Period> interval, bool blocking, bool runOnThread,
                                bool canBeSkipped,
-                               chrono::duration<Rep, Period> endAfter)
+                               std::chrono::duration<Rep, Period> endAfter)
     : TaskController(std::move(task), id, blocking, runOnThread), interval(interval), canBeSkipped(canBeSkipped) {
     if (endAfter > 0s) {
         this->endWorkTime = std::chrono::system_clock::now() + endAfter;

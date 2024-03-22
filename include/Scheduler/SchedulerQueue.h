@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <string>
-#include "Task.h"
+#include "TaskController.h"
 
 using namespace std;
 #define SHEDULERLIST_H
@@ -25,7 +25,7 @@ public:
      * Get actual task
      * @return
      */
-    TaskInterface *getTask();
+    TaskController *getTask();
 
     /**
      * Get execute time from actual task
@@ -80,7 +80,7 @@ public:
      * @param tsk address to task
      * @param timeExec time when task should be executed
      */
-    void addTask(TaskInterface *tsk, chrono::time_point<chrono::system_clock> timeExec);
+    void addTask(TaskController *tsk, chrono::time_point<chrono::system_clock> timeExec);
 
     /**
      * Print tasks id in queue
@@ -108,11 +108,11 @@ protected:
 private:
     class waitTask {
     public:
-        TaskInterface *task;
+        TaskController *task;
         chrono::time_point<chrono::system_clock> timeExec;
         waitTask *next = nullptr;
 
-        waitTask(TaskInterface *task, chrono::time_point<chrono::system_clock> timeExec, waitTask *next = nullptr) {
+        waitTask(TaskController *task, chrono::time_point<chrono::system_clock> timeExec, waitTask *next = nullptr) {
             this->task = task;
             this->timeExec = timeExec;
             this->next = next;

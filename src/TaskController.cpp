@@ -22,7 +22,7 @@ TaskController::TaskController(TaskTypeInterface *task, unsigned int id, bool bl
  * @param blocking if true all tasks run on thread must end before start this task.
  * @param runOnThread run this task on separate thread
  */
-TaskController::TaskController(unique_ptr<TaskTypeInterface> task, unsigned int id, bool blocking, bool runOnThread)
+TaskController::TaskController(std::unique_ptr<TaskTypeInterface> task, unsigned int id, bool blocking, bool runOnThread)
     : id(id), blocking(blocking), runOnThread(runOnThread), task(std::move(task)) {
 }
 

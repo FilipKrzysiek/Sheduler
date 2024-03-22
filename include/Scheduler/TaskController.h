@@ -8,7 +8,11 @@
 #include <memory>
 #include <TaskTypeInterface.h>
 
+#include "Exception.h"
+
 using tp_system_clock = std::chrono::time_point<std::chrono::system_clock>;
+
+using namespace std::chrono_literals;
 
 class TaskController {
 protected:
@@ -17,7 +21,7 @@ protected:
     bool blocking;
     const bool runOnThread;
 
-    unique_ptr<TaskTypeInterface> task;
+    std::unique_ptr<TaskTypeInterface> task;
 
 public:
     /**
@@ -36,7 +40,9 @@ public:
      * @param blocking
      * @param run_on_thread
      */
-    TaskController(unique_ptr<TaskTypeInterface> task, unsigned int id, bool blocking, bool runOnThread);
+    TaskController(std::unique_ptr<TaskTypeInterface> task, unsigned int id, bool blocking, bool runOnThread);
+
+    virtual ~TaskController() = default;
 
     /**
      * Get last execute task time.
@@ -62,7 +68,7 @@ public:
      */
     bool isRunOnThread() const;
 
-    void execute();
+    virtual void execute();
 };
 
 

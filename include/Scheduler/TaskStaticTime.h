@@ -32,7 +32,7 @@ public:
      * @param runOnThread run this task on separate thread
      * @param skipOtherTasks true - other repeatable task will be skipped, when this task work, false - other task wait to end work this task
      */
-    TaskStaticTime(unique_ptr<TaskTypeInterface> task, unsigned int id, tp_system_clock staticExecuteTime,
+    TaskStaticTime(std::unique_ptr<TaskTypeInterface> task, unsigned int id, tp_system_clock staticExecuteTime,
                    bool blocking = false, bool runOnThread = false, bool skipOtherTasks = true);
 
     /**

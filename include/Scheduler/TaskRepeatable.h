@@ -5,8 +5,6 @@
 #ifndef TASKREPEATABLE_H
 #define TASKREPEATABLE_H
 
-#include <chrono>
-
 #include "TaskController.h"
 
 class TaskRepeatable : public TaskController {
@@ -24,9 +22,9 @@ public:
      * @param endAfter if 0s never ending task, else time after which task will end work (not run again).
      */
     template<class Rep, class Period>
-    TaskRepeatable(TaskTypeInterface *task, unsigned int id, chrono::duration<Rep, Period> interval,
+    TaskRepeatable(TaskTypeInterface *task, unsigned int id, std::chrono::duration<Rep, Period> interval,
                    bool blocking = false, bool runOnThread = false, bool canBeSkipped = false,
-                   chrono::duration<Rep, Period> endAfter = 0s);
+                   std::chrono::duration<Rep, Period> endAfter = 0s);
 
     /**
      * Create repeatable task
@@ -41,9 +39,9 @@ public:
      * @param endAfter if 0s never ending task, else time after which task will end work (not run again).
      */
     template<class Rep, class Period>
-    TaskRepeatable(unique_ptr<TaskTypeInterface> task, unsigned int id, chrono::duration<Rep, Period> interval,
+    TaskRepeatable(std::unique_ptr<TaskTypeInterface> task, unsigned int id, std::chrono::duration<Rep, Period> interval,
                    bool blocking = false, bool runOnThread = false, bool canBeSkipped = false,
-                   chrono::duration<Rep, Period> endAfter = 0s);
+                   std::chrono::duration<Rep, Period> endAfter = 0s);
 
     virtual ~TaskRepeatable() {
     };

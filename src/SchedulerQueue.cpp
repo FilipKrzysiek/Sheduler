@@ -1,5 +1,9 @@
 #include "SchedulerQueue.h"
 
+#include <TaskClass.h>
+#include <TaskFunction.h>
+#include <TaskRepeatable.h>
+
 SchedulerQueue::SchedulerQueue() {
     this->planedExec = 3;
     this->nextExisting = false;
@@ -39,7 +43,7 @@ bool SchedulerQueue::next() {
     }
 }
 
-TaskInterface *SchedulerQueue::getTask() {
+TaskController *SchedulerQueue::getTask() {
     if (wTaskActual != nullptr)
         return wTaskActual->task;
     else
@@ -121,7 +125,7 @@ string SchedulerQueue::getTaskTimeList() {
     return txt;
 }
 
-void SchedulerQueue::addTask(TaskInterface *tsk, chrono::time_point<chrono::system_clock> timeExec) {
+void SchedulerQueue::addTask(TaskController *tsk, chrono::time_point<chrono::system_clock> timeExec) {
     if (isExisting()) {
         waitTask *iter = this->wTaskActual, *prev = nullptr;
 
@@ -154,8 +158,8 @@ void SchedulerQueue::addTask(TaskInterface *tsk, chrono::time_point<chrono::syst
 }
 
 void SchedulerQueue::addActual() {
-    TaskInterface *tsk;
-    tsk = this->getTask();
+    TaskRepeatable *tsk;
+    tsk = dynamic_cast<TaskRepeatable*>(getTask());
     chrono::time_point<chrono::system_clock> nextExecTime, now;
     now = chrono::system_clock::now();
     if (tsk != nullptr) {

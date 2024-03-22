@@ -7,6 +7,9 @@
 #include <chrono>
 #include <thread>
 #include <future>
+#include <TaskRepeatable.h>
+#include <TaskStaticTime.h>
+
 #include "TaskClassInterface.h"
 #include "TaskClass.h"
 #include "TaskFunction.h"
@@ -188,7 +191,7 @@ public:
      * @param delayBetweenTasks time in chrono rime value (eg. chrono::seconds)
      */
     template<class Rep, class Period>
-    void setDelayBetweenTasks(const chrono::duration<Rep, Period> time &delayBetweenTasks);
+    void setDelayBetweenTasks(const chrono::duration<Rep, Period> &delayBetweenTasks);
 
     /**
      * @brief Run sheduler, start executing tasks.

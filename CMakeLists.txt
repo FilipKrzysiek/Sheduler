@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(Scheduler)
+project(Scheduler CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -16,7 +16,8 @@ add_library(Scheduler STATIC
         src/TaskClass.cpp
         src/TaskFunction.cpp
         src/TaskController.cpp
-        include/Scheduler/TaskController.h)
+
+)
 
 
 #add_library(SchedulerShared SHARED

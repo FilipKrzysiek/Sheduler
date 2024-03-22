@@ -13,7 +13,7 @@ public:
      * Create function task
      * @param execFun function to execute
      */
-    TaskFunction(void (*execFun)()): execFun(execFun) {}
+    TaskFunction(void (*execFun)());
 
     virtual ~TaskFunction() {};
 
