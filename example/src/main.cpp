@@ -33,6 +33,11 @@ void myFunctionSkippable() {
     cout << currentDateTime() << "\t\t\t x \t\tMy skippable function" << endl;
 }
 
+void myFunctionCallingAt() {
+    cout << currentDateTime() << "\t\t\t\t\tx Caling at <----------------------" << endl;
+    this_thread::sleep_for(5s);
+}
+
 class ExampleClass: public TaskClassInterface {
 public:
     void execute() override {
@@ -54,6 +59,7 @@ int main(int argc, char *argv[])
     scheduler.addNewTask(5s, myFunctionEndAfter, false, false, true, 20s);
     scheduler.addNewTask(1s, &ex, false, false);
     scheduler.addNewTask(1s, myFunctionSkippable, true, true);
+    scheduler.addNewTaskCallingAt(chrono::system_clock::now() + 3s, myFunctionCallingAt, false, true);
 
     cout << "Start scheduler" << endl;
 

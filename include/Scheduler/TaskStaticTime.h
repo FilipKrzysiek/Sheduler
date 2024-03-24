@@ -18,10 +18,10 @@ public:
      * @param staticExecuteTime time when task should be executed
      * @param blocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
      * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
-     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated (based of actual time), after end this task.
+     * When true - execution time of all task will be recalculated (based of actual time), after end this task, if false - all outdated tasks will be skipped.
      */
     TaskStaticTime(TaskTypeInterface *task, unsigned int id, tp_system_clock staticExecuteTime, bool blocking = false,
-                   bool recalcRepTasks = true);
+                   bool recalcRepTasks = false);
 
     /**
      * Create static time task
@@ -30,10 +30,10 @@ public:
      * @param staticExecuteTime time when task should be executed
      * @param blocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
      * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
-     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated (based of actual time), after end this task.
+     * When true - execution time of all task will be recalculated (based of actual time), after end this task, if false - all outdated tasks will be skipped.
      */
     TaskStaticTime(std::unique_ptr<TaskTypeInterface> task, unsigned int id, tp_system_clock staticExecuteTime,
-                   bool blocking = false, bool recalcRepTasks = true);
+                   bool blocking = false, bool recalcRepTasks = false);
 
     /**
      * Return time when task should be executed.
@@ -45,7 +45,7 @@ public:
     /**
      * Get value of flag recalcRepTasks (recalculateRepeatableTasksTime). This option works only when blocking was set to true.
      * RecalcRepTasks flag change behaviour of recalculating repeatable task execution time.
-     * @return When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated (based of actual time), after end this task.
+     * @return When true - execution time of all task will be recalculated (based of actual time), after end this task, if false - all outdated tasks will be skipped.
      */
     bool getRecalcRepTasks() const;
 
