@@ -21,10 +21,9 @@ public:
      * @param canBeSkipped Can skipp this task if is delayed
      * @param endAfter if 0s never ending task, else time after which task will end work (not run again).
      */
-    template<class Rep, class Period>
-    TaskRepeatable(TaskTypeInterface *task, unsigned int id, std::chrono::duration<Rep, Period> interval,
+    TaskRepeatable(TaskTypeInterface *task, unsigned int id, std::chrono::microseconds interval,
                    bool blocking = false, bool runOnThread = false, bool canBeSkipped = false,
-                   std::chrono::duration<Rep, Period> endAfter = 0s);
+                   std::chrono::microseconds endAfter = 0s);
 
     /**
      * Create repeatable task
@@ -38,10 +37,9 @@ public:
      * @param canBeSkipped Can skipp this task if is delayed
      * @param endAfter if 0s never ending task, else time after which task will end work (not run again).
      */
-    template<class Rep, class Period>
-    TaskRepeatable(std::unique_ptr<TaskTypeInterface> task, unsigned int id, std::chrono::duration<Rep, Period> interval,
+    TaskRepeatable(std::unique_ptr<TaskTypeInterface> task, unsigned int id, std::chrono::microseconds interval,
                    bool blocking = false, bool runOnThread = false, bool canBeSkipped = false,
-                   std::chrono::duration<Rep, Period> endAfter = 0s);
+                   std::chrono::microseconds endAfter = 0s);
 
     virtual ~TaskRepeatable() {
     };
@@ -77,13 +75,13 @@ public:
     /**
      * Return interval executing task.
      * Only for repeatable task.
-     * @return time in seconds.
+     * @return time in microseconds.
      */
-    std::chrono::seconds getInterval();
+    std::chrono::microseconds getInterval();
 
 protected:
     tp_system_clock endWorkTime;
-    std::chrono::seconds interval;
+    std::chrono::microseconds interval;
     bool canBeSkipped;
     bool isNeverEnding;
 };

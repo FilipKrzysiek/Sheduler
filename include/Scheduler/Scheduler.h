@@ -5,21 +5,26 @@
 #include <string>
 #include <iostream>
 #include <chrono>
+#include <deque>
 #include <thread>
+#include <algorithm>
 #include <future>
-#include <TaskRepeatable.h>
-#include <TaskStaticTime.h>
+#include <map>
+#include "TaskRepeatable.h"
+#include "TaskStaticTime.h"
 
 #include "TaskClassInterface.h"
-#include "TaskClass.h"
 #include "TaskFunction.h"
+#include "TaskClass.h"
 #include "Exception.h"
-#include "SchedulerQueue.h"
 
 using namespace std;
 using namespace std::chrono_literals;
 using system_clock_time = chrono::time_point<chrono::system_clock>;
 
+//TODO delete ended task from list
+//TODO pass class method like to std::thread
+//TODO add lambda
 
 class Scheduler {
 public:
@@ -29,8 +34,7 @@ public:
      * Create sheduler and set time after app wnd work.
      * @param endAfter
      */
-    template<class Rep, class Period>
-    explicit Scheduler(chrono::duration<Rep, Period> endAfter);
+    explicit Scheduler(chrono::microseconds endAfter);
 
     virtual ~Scheduler();
 
@@ -40,71 +44,69 @@ public:
      * @param interval Interval of calling passed function.
      * @param execFun Address for function to call (execute).
      * @param runOnThread run this task on thread
-     * @param canSkipped Call can be skipped when is delayed.
+     * @param canSkipped Call can be skipped when is delayed or when the same task still work.
      * @param isBlocking if true all tasks run on thread must end before start this task.
      * @param endAfter Ending after seconds. If 0 never ending.
      */
-    template<class Rep, class Period>
-    void addNewTask(chrono::duration<Rep, Period> interval, void (*execFun)(), bool runOnThread = true,
-                    bool canSkipped = true, bool isBlocking = false, chrono::duration<Rep, Period> endAfter = 0s);
+    void addNewTask(chrono::microseconds interval, void (*execFun)(), bool runOnThread = true,
+                    bool canSkipped = true, bool isBlocking = false, chrono::microseconds endAfter = 0s);
 
     /**
      * Adding new task to que.
      * @param interval Interval of calling passed function.
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
      * @param runOnThread run this task on thread
-     * @param canSkipped Call can be skipped when is delayed.
+     * @param canSkipped Call can be skipped when is delayed or when the same task still work.
      * @param isBlocking if true all tasks run on thread must end before start this task.
      * @param endAfter Ending after seconds. If 0 never ending.
      */
-    template<class Rep, class Period>
-    void addNewTask(chrono::duration<Rep, Period> interval, TaskClassInterface *clss, bool runOnThread = true,
-                    bool canSkipped = true, bool isBlocking = false, chrono::duration<Rep, Period> endAfter = 0s);
+    void addNewTask(chrono::microseconds interval, TaskClassInterface *clss, bool runOnThread = true,
+                    bool canSkipped = true, bool isBlocking = false, chrono::microseconds endAfter = 0s);
 
 
     /**
      * Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param execFun Address for function to call (execute).
-     * @param runOnThread run this task on thread
-     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
-     * @param isBlocking if true all tasks run on thread must end before start this task.
+     * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
+     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated, after end this task.
+     * @param isBlocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
      */
-    void addNewTaskCallingAt(system_clock_time timeToExecute, void (*execFun)(), bool runOnThread = true,
-                             bool skippOtherTasks = true, bool isBlocking = false);
+    void addNewTaskCallingAt(system_clock_time timeToExecute, void (*execFun)(), bool recalcRepTasks = true,
+                             bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
-     * @param runOnThread run this task on thread
-     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
-     * @param isBlocking if true all tasks run on thread must end before start this task.
+     * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
+     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated, after end this task.
+     * @param isBlocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
      */
-    void addNewTaskCallingAt(system_clock_time timeToExecute, TaskClassInterface *clss, bool runOnThread = true,
-                             bool skippOtherTasks = true, bool isBlocking = false);
+    void addNewTaskCallingAt(system_clock_time timeToExecute, TaskClassInterface *clss, bool recalcRepTasks = true,
+                             bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param execFun Address for function to call (execute).
-     * @param runOnThread run this task on thread
-     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
-     * @param isBlocking if true all tasks run on thread must end before start this task.
+     * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
+     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated, after end this task.
+     * @param isBlocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
      */
-    void addNewTaskCallingAt(time_t timeToExecute, void (*execFun)(), bool runOnThread = true,
-                             bool skippOtherTasks = true, bool isBlocking = false);
+    void addNewTaskCallingAt(time_t timeToExecute, void (*execFun)(), bool recalcRepTasks = true,
+                             bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
-     * @param runOnThread run this task on thread
-     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
-     * @param isBlocking if true all tasks run on thread must end before start this task.
+     * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
+     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated, after end this task.
+     * @param isBlocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
      */
-    void addNewTaskCallingAt(time_t timeToExecute, TaskClassInterface *clss, bool runOnThread = true,
-                             bool skippOtherTasks = true, bool isBlocking = false);
+    void addNewTaskCallingAt(time_t timeToExecute, TaskClassInterface *clss, bool recalcRepTasks = true,
+                             bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
@@ -112,12 +114,12 @@ public:
      * @param minute Minute when task must be executed.
      * @param second Second when task must be executed.
      * @param execFun Address for function to call (execute).
-     * @param runOnThread run this task on thread
-     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
-     * @param isBlocking if true all tasks run on thread must end before start this task.
+     * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
+     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated, after end this task.
+     * @param isBlocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
      */
     void addNewTaskCallingAt(unsigned short hour, unsigned short minute, unsigned short second, void (*execFun)(),
-                             bool runOnThread = true, bool skippOtherTasks = true, bool isBlocking = false);
+                             bool recalcRepTasks = true, bool isBlocking = false);
 
     /**
      * Add new task executing addTask specific time
@@ -125,13 +127,12 @@ public:
      * @param minute Minute when task must be executed.
      * @param second Second when task must be executed.
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
-     * @param runOnThread run this task on thread
-     * @param skippOtherTasks Skipping other periodic task, when this task was executing (checked can't skipped too) default true
-     * @param isBlocking if true all tasks run on thread must end before start this task.
+     * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
+     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated, after end this task.
+     * @param isBlocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
      */
     void addNewTaskCallingAt(unsigned short hour, unsigned short minute, unsigned short second,
-                             TaskClassInterface *clss, bool runOnThread = true, bool skippOtherTasks = true,
-                             bool isBlocking = false);
+                             TaskClassInterface *clss, bool recalcRepTasks = true, bool isBlocking = false);
 
     //TODO make constexpr
 
@@ -139,8 +140,7 @@ public:
      * Set after how many minutes sheduler must end work. If not set sheduler never ending.
      * @param time Time from begin to end sheduler work. It schould be chrono time value (eg. chrono::minutes)
      */
-    template<class Rep, class Period>
-    void setEndWorkTimeAfter(chrono::duration<Rep, Period> time);
+    void setEndWorkTimeAfter(chrono::microseconds time);
 
     /**
      * Set datetime when sheduler muest end work. If not set sheduler never ending.
@@ -170,10 +170,9 @@ public:
 
     /**
      * @brief Set max time gap between tasks. If time gap is higher than declared throw error.
-     * @param time in chrono time value (eg. chrono::minutes) default 1h
+     * @param time in chrono time value (eg. chrono::minutes) default 2h
      */
-    template<class Rep, class Period>
-    void setMaxTimeGap(chrono::duration<Rep, Period> time);
+    void setMaxTimeGap(chrono::microseconds time);
 
     /**
      * Set flag end when repeatable task queue is empty or repeatable task and static time task queue is empty.
@@ -190,8 +189,7 @@ public:
      * Default 1s.
      * @param delayBetweenTasks time in chrono rime value (eg. chrono::seconds)
      */
-    template<class Rep, class Period>
-    void setDelayBetweenTasks(const chrono::duration<Rep, Period> &delayBetweenTasks);
+    void setDelayBetweenTasks(const chrono::microseconds &delayBetweenTasks);
 
     /**
      * @brief Run sheduler, start executing tasks.
@@ -201,92 +199,68 @@ public:
     //TODO stop
 
 private:
-    class TaskOnThread {
-    public:
-        explicit TaskOnThread(TaskController *task);
-
-        virtual ~TaskOnThread();
-
-        bool taskEnd() const;
-
-        unsigned int getTaskId() const;
-
-    private:
-        thread th;
-        bool working = true;
-        TaskController *task;
-
-        void threadTask();
-    };
-
     struct TaskListItem {
-        TaskController *task;
+        TaskRepeatable *repetableTask;
+        TaskStaticTime *staticTask;
         system_clock_time execTime;
+
+        TaskListItem(unique_ptr<TaskRepeatable> &repeatable,
+                     const system_clock_time &execTime): repetableTask(repeatable.get()), staticTask(nullptr),
+                                                         execTime(execTime) {
+        }
+
+        TaskListItem(unique_ptr<TaskStaticTime> &staticTask, const system_clock_time &execTime): repetableTask(nullptr),
+            staticTask(staticTask.get()), execTime(execTime) {
+        }
     };
 
+    const unsigned short planedTasks = 4;
     system_clock_time endWorkingTime, now;
-    chrono::microseconds slept = 0ms;
     chrono::microseconds delayBetweenTasks = 1s;
-    chrono::seconds maxTimeGap = 1h;
-    const chrono::milliseconds waitForEndTaskOnThreadTime = 5ms;
+    chrono::microseconds acceptedDelay = 1s; //TODO add setter
+    chrono::microseconds maxTimeGap = 2h;
     vector<unique_ptr<TaskRepeatable> > repeatableTaskList;
     vector<unique_ptr<TaskStaticTime> > staticTimeTaskList;
-    vector<TaskOnThread *> runningTaskOnThread;
-    SchedulerQueue schedulerQueueRepeatable, schedulerQueueStaticTime;
 
-    unsigned int taskId;
-    unsigned int planedExec;
-    thread taskCollector;
-    mutex runningTaskOnThreadLocker;
+    deque<TaskListItem> taskQueue;
+    map<unsigned int, future<void> > mapTasksOnThread;
+
+    unsigned int taskId = 0;
     bool flgEndWorkTimeEnabled = false;
     bool flgEndWhenRepeatableEnd = true;
-    bool flgIsAnyTaskOnThread = false;
-    bool flgEndTaskCollector = false;
 
-    /**
-     *
-     */
-    void prepareRun();
-
-    void prepareRunRepeatable();
-
-    void prepareRunStaticTime();
-
-    void runLoop();
-
-    /**
-     *
-     * @return true if static time task was runned, false if not runned
-     */
-    bool runStaticTime();
-
-    void runRepeatable();
-
-    void skippingTasks();
-
-    void executeRepeatableTask();
-
-    void executeTask(TaskController *task);
 
     bool checkCorrectTime(unsigned short hour, unsigned short minute, unsigned short second);
 
     bool checkCorrectDate(unsigned short year, unsigned short month, unsigned short day);
 
-    inline bool checkEndLoop(SchedulerQueue *repeatable, SchedulerQueue *staticTime);
-
     time_t calculateEndTime(time_t base, unsigned short hour, unsigned short minute, unsigned short second);
 
-    chrono::milliseconds calcSleepTime();
+    void prepareRun();
 
-    system_clock_time calculateExecuteTime(system_clock_time executeTime);
+    void preapreRunRepeatableTasks();
 
-    string getTaskTimeList();
+    void runLoop();
 
-    chrono::microseconds getSleept();
+    bool mainLoopCondition();
 
-    bool thisTaskIsRunning(unsigned int id);
+    void waitToEndAllTasksOnThread();
 
-    void taskCollectorFunction();
+    void updateTasksOnThread();
+
+    void executeStaticTimeTask(deque<TaskListItem>::iterator &actualtaskContr);
+
+    void executeRepeatabletask(deque<TaskListItem>::iterator &actualtaskContr);
+
+    void repeatRepatableTask(deque<TaskListItem>::iterator &actualtaskContr);
+
+    chrono::microseconds calcSleepTime();
+
+    void processDelays();
+
+    void updateNow();
+
+    void addTaskToQueue(const TaskListItem &task);
 };
 
 #endif // SCHEDULER_H

@@ -6,7 +6,7 @@
 #define TASKCONTROLLER_H
 #include <chrono>
 #include <memory>
-#include <TaskTypeInterface.h>
+#include "TaskTypeInterface.h"
 
 #include "Exception.h"
 
@@ -48,7 +48,7 @@ public:
      * Get last execute task time.
      * @return Time of last execute
      */
-    std::chrono::time_point<std::chrono::system_clock> getLastExecute() const;
+    tp_system_clock getLastExecute() const;
 
     /**
      * Get task id.

@@ -16,24 +16,24 @@ public:
      * @param task task to execute. Allocate it in constructor. In this object it will be keept in unique ptr
      * @param id task id
      * @param staticExecuteTime time when task should be executed
-     * @param blocking if true all tasks run on thread must end before start this task.
-     * @param runOnThread run this task on separate thread
-     * @param skipOtherTasks true - other repeatable task will be skipped, when this task work, false - other task wait to end work this task
+     * @param blocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
+     * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
+     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated (based of actual time), after end this task.
      */
     TaskStaticTime(TaskTypeInterface *task, unsigned int id, tp_system_clock staticExecuteTime, bool blocking = false,
-                   bool runOnThread = false, bool skipOtherTasks = true);
+                   bool recalcRepTasks = true);
 
     /**
      * Create static time task
      * @param task task to execute. Allocate it in constructor. In this object it will be keept in unique ptr
      * @param id task id
      * @param staticExecuteTime time when task should be executed
-     * @param blocking if true all tasks run on thread must end before start this task.
-     * @param runOnThread run this task on separate thread
-     * @param skipOtherTasks true - other repeatable task will be skipped, when this task work, false - other task wait to end work this task
+     * @param blocking if true all tasks run on thread must end before start this task and all another tasks will wait until this task end.
+     * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
+     * When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated (based of actual time), after end this task.
      */
     TaskStaticTime(std::unique_ptr<TaskTypeInterface> task, unsigned int id, tp_system_clock staticExecuteTime,
-                   bool blocking = false, bool runOnThread = false, bool skipOtherTasks = true);
+                   bool blocking = false, bool recalcRepTasks = true);
 
     /**
      * Return time when task should be executed.
@@ -43,11 +43,11 @@ public:
     tp_system_clock getStaticExecuteTime() const;
 
     /**
-     * Check that other repeatable task will be skipped or must wait to end this task. Static time task have higher priority.
-     * Only for static time tasks.
-     * @return true - other repeatable tasks will be skipped, false - other repeatable task must wait
+     * Get value of flag recalcRepTasks (recalculateRepeatableTasksTime). This option works only when blocking was set to true.
+     * RecalcRepTasks flag change behaviour of recalculating repeatable task execution time.
+     * @return When true - all outdated tasks will be skipped, if false - execution time of all task will be recalculated (based of actual time), after end this task.
      */
-    bool getSkipOtherTasks() const;
+    bool getRecalcRepTasks() const;
 
     /**
      * Increment date by 24h
@@ -57,7 +57,7 @@ public:
 protected:
     tp_system_clock staticExecuteTime;
 
-    bool skipOtherTasks;
+    bool recalcRepTasks;
 };
 
 

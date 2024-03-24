@@ -4,10 +4,9 @@
 
 #include "TaskRepeatable.h"
 
-template<class Rep, class Period>
-TaskRepeatable::TaskRepeatable(TaskTypeInterface *task, unsigned int id, std::chrono::duration<Rep, Period> interval,
+TaskRepeatable::TaskRepeatable(TaskTypeInterface *task, unsigned int id, std::chrono::microseconds interval,
                                bool blocking, bool runOnThread, bool canBeSkipped,
-                               std::chrono::duration<Rep, Period> endAfter)
+                               std::chrono::microseconds endAfter)
     : TaskController(task, id, blocking, runOnThread), interval(interval), canBeSkipped(canBeSkipped) {
     if (endAfter > 0s) {
         this->endWorkTime = std::chrono::system_clock::now() + endAfter;
@@ -15,15 +14,15 @@ TaskRepeatable::TaskRepeatable(TaskTypeInterface *task, unsigned int id, std::ch
     } else if (endAfter == 0s) {
         this->isNeverEnding = true;
     } else {
-        throw Exception("Passed endAfter less than 0");
+        //TODO static_assert
+        throw scheduler::exception("Passed endAfter less than 0");
     }
 }
 
-template<class Rep, class Period>
 TaskRepeatable::TaskRepeatable(std::unique_ptr<TaskTypeInterface> task, unsigned int id,
-                               std::chrono::duration<Rep, Period> interval, bool blocking, bool runOnThread,
+                               std::chrono::microseconds interval, bool blocking, bool runOnThread,
                                bool canBeSkipped,
-                               std::chrono::duration<Rep, Period> endAfter)
+                               std::chrono::microseconds endAfter)
     : TaskController(std::move(task), id, blocking, runOnThread), interval(interval), canBeSkipped(canBeSkipped) {
     if (endAfter > 0s) {
         this->endWorkTime = std::chrono::system_clock::now() + endAfter;
@@ -31,23 +30,25 @@ TaskRepeatable::TaskRepeatable(std::unique_ptr<TaskTypeInterface> task, unsigned
     } else if (endAfter == 0s) {
         this->isNeverEnding = true;
     } else {
-        throw Exception("Passed endAfter less than 0");
+        //TODO static_assert
+        throw scheduler::exception("Passed endAfter less than 0");
     }
 }
 
 std::chrono::time_point<std::chrono::system_clock> TaskRepeatable::getEndTime() {
-    return this->endWorkTime;
+    return endWorkTime;
 }
 
 bool TaskRepeatable::getCanSkipped() {
-    return this->canBeSkipped;
+    return canBeSkipped;
 }
 
 bool TaskRepeatable::outOfTime() {
-    return std::chrono::system_clock::now() < endWorkTime;
+    if (isNeverEnding) return false;
+    return std::chrono::system_clock::now() > endWorkTime;
 }
 
-std::chrono::seconds TaskRepeatable::getInterval() {
+std::chrono::microseconds TaskRepeatable::getInterval() {
     return interval;
 }
 
