@@ -187,9 +187,15 @@ public:
      * Set delay between tasks on theirs first run (that all task not started at the same time, because second, third...
      * task was delayed when they started).
      * Default 1s.
-     * @param delayBetweenTasks time in chrono rime value (eg. chrono::seconds)
+     * @param delayBetweenTasks time in chrono rime value (eg. chrono::microseconds)
      */
     void setDelayBetweenTasks(const chrono::microseconds &delayBetweenTasks);
+
+    /**
+     * Set accepted delay in calling tasks. If delay is exceeded time of next call will be racalculate
+     * @param acceptedDelay time in chrono rime value (eg. chrono::microseconds) (default 1s)
+     */
+    void setAcceptedDelay(const chrono::microseconds &acceptedDelay);
 
     /**
      * @brief Run sheduler, start executing tasks.
@@ -217,7 +223,7 @@ private:
     const unsigned short planedTasks = 4;
     system_clock_time endWorkingTime, now;
     chrono::microseconds delayBetweenTasks = 1s;
-    chrono::microseconds acceptedDelay = 1s; //TODO add setter
+    chrono::microseconds acceptedDelay = 1s;
     chrono::microseconds maxTimeGap = 2h;
     vector<unique_ptr<TaskRepeatable> > repeatableTaskList;
     vector<unique_ptr<TaskStaticTime> > staticTimeTaskList;
@@ -255,6 +261,8 @@ private:
     void repeatRepatableTask(deque<TaskListItem>::iterator &actualtaskContr);
 
     chrono::microseconds calcSleepTime();
+
+    system_clock_time getTimeOfLastElement(const TaskListItem &task) const;
 
     void processDelays();
 

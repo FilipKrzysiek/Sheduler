@@ -22,26 +22,26 @@ const std::string currentDateTime() {
 }
 
 void myFunction() {
-    cout << currentDateTime() << "\t x \t\t\t\tMy function" << endl;
+    cout << currentDateTime() << "\t x \t\t\t\t\t My function" << endl;
 }
 
 void myFunctionEndAfter() {
-    cout << currentDateTime() << "\t\t x\t\t\tMy function end after" << endl;
+    cout << currentDateTime() << "\t\t x\t\t\t \t My function end after" << endl;
 }
 
 void myFunctionSkippable() {
-    cout << currentDateTime() << "\t\t\t x \t\tMy skippable function" << endl;
+    cout << currentDateTime() << "\t\t\t x \t\t\t My skippable function" << endl;
 }
 
 void myFunctionCallingAt() {
-    cout << currentDateTime() << "\t\t\t\t\tx Caling at <----------------------" << endl;
+    cout << currentDateTime() << "\t\t\t\t\t x \t Caling at <----------------------" << endl;
     this_thread::sleep_for(5s);
 }
 
 class ExampleClass: public TaskClassInterface {
 public:
     void execute() override {
-        cout << currentDateTime() << "\t\t\t\t x \tclass task" << endl;
+        cout << currentDateTime() << "\t\t\t\t x \t\t class task" << endl;
     }
 };
 
@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
     scheduler.setDelayBetweenTasks(100ms);
     scheduler.addNewTask(5s, myFunction);
     scheduler.addNewTask(5s, myFunctionEndAfter, false, false, true, 20s);
-    scheduler.addNewTask(1s, &ex, false, false);
-    scheduler.addNewTask(1s, myFunctionSkippable, true, true);
+    scheduler.addNewTask(2s, &ex, false, false);
+    scheduler.addNewTask(2s, myFunctionSkippable, true, true);
     scheduler.addNewTaskCallingAt(chrono::system_clock::now() + 3s, myFunctionCallingAt, false, true);
 
     cout << "Start scheduler" << endl;

@@ -98,14 +98,6 @@ void Scheduler::setMaxTimeGap(chrono::microseconds time) {
     maxTimeGap = time;
 }
 
-// string Scheduler::getTaskTimeList() {
-//     return schedulerQueueRepeatable.getTaskTimeList();
-// }
-
-// chrono::microseconds Scheduler::getSleept() {
-//     return slept;
-// }
-
 bool Scheduler::checkCorrectTime(unsigned short hour, unsigned short minute, unsigned short second) {
     return !(hour > 23 || minute > 59 || second > 59);
 }
@@ -146,23 +138,6 @@ time_t Scheduler::calculateEndTime(time_t base, unsigned short hour, unsigned sh
 
     return mktime(localTime);
 }
-
-// system_clock_time Scheduler::calculateExecuteTime(system_clock_time executeTime) {
-//     time_t timeTNow, timeTExecuteTime;
-//     time(&timeTNow);
-//     timeTExecuteTime = chrono::system_clock::to_time_t(executeTime);
-//     tm *localNow, *localExec;
-//     localNow = localtime(&timeTNow);
-//     localExec = localtime(&timeTExecuteTime);
-//
-//     localNow->tm_hour = localExec->tm_hour;
-//     localNow->tm_min = localExec->tm_min;
-//     localNow->tm_sec = localExec->tm_sec;
-//
-//     timeTExecuteTime = mktime(localNow);
-//
-//     return chrono::system_clock::from_time_t(timeTExecuteTime);
-// }
 
 void Scheduler::setEndWorkTime(time_t date, bool getOnlyTime) {
     setEndWorkTime(chrono::system_clock::from_time_t(date), getOnlyTime);
@@ -213,6 +188,10 @@ void Scheduler::setEndWhenRepeatableEnd(bool flg) {
 
 void Scheduler::setDelayBetweenTasks(const chrono::microseconds &delayBetweenTasks) {
     Scheduler::delayBetweenTasks = delayBetweenTasks;
+}
+
+void Scheduler::setAcceptedDelay(const chrono::microseconds &acceptedDelay) {
+    this->acceptedDelay = acceptedDelay;
 }
 
 
@@ -296,7 +275,6 @@ void Scheduler::preapreRunRepeatableTasks() {
 }
 
 void Scheduler::addTaskToQueue(const TaskListItem &task) {
-    //TODO make more complex, check that the same task don't work on the same time
     if (task.repetableTask != nullptr && task.repetableTask->outOfTime()) {
         return;
     }
@@ -304,6 +282,14 @@ void Scheduler::addTaskToQueue(const TaskListItem &task) {
     if (taskQueue.empty()) {
         taskQueue.push_back(task);
     } else {
+        // for (int i = taskQueue.size() - 1; i >= 0; --i) {
+        //     if (taskQueue[i].execTime < task.execTime) {
+        //         taskQueue.insert(taskQueue.begin() + i, task);
+        //         return;
+        //     }
+        // }
+        // taskQueue.push_front(task);
+
         for (size_t i = 0; i < taskQueue.size(); ++i) {
             if (taskQueue[i].execTime > task.execTime) {
                 taskQueue.insert(taskQueue.begin() + i, task);
@@ -390,11 +376,13 @@ void Scheduler::executeRepeatabletask(deque<TaskListItem>::iterator &actualtaskC
 
 void Scheduler::repeatRepatableTask(deque<TaskListItem>::iterator &actualtaskContr) {
     auto task = actualtaskContr->repetableTask;
-    if (!task->getIsNeverEnding() && now + planedTasks * task->getInterval() > task->getEndTime()) {
+    auto timeOfNextCall = getTimeOfLastElement(*actualtaskContr) + task->getInterval();
+    if (!task->getIsNeverEnding() && timeOfNextCall > task->getEndTime()) {
         return;
     }
 
-    actualtaskContr->execTime = actualtaskContr->execTime + planedTasks * task->getInterval();
+    // actualtaskContr->execTime = actualtaskContr->execTime + planedTasks * task->getInterval();
+    actualtaskContr->execTime = timeOfNextCall;
     addTaskToQueue(*actualtaskContr);
 }
 
@@ -416,9 +404,20 @@ chrono::microseconds Scheduler::calcSleepTime() {
     return sleepTime;
 }
 
+system_clock_time Scheduler::getTimeOfLastElement(const TaskListItem &task) const {
+    for (int i = taskQueue.size() - 1; i >= 0; --i) {
+        if (taskQueue[i].repetableTask != nullptr && taskQueue[i].repetableTask->getId() == task.repetableTask->getId()) {
+            return taskQueue[i].execTime;
+        }
+    }
+
+    return now;
+}
+
 void Scheduler::processDelays() {
     auto delayTime = abs(chrono::duration_cast<chrono::microseconds>(taskQueue[0].execTime - now).count());
     if (taskQueue[0].staticTask == nullptr && delayTime > acceptedDelay.count() && taskQueue.size() > 1) {
+        //TODO optymalise
         for (size_t i = 1; i < taskQueue.size(); ++i) {
             if (taskQueue[i].repetableTask == nullptr) {
                 continue;
@@ -436,7 +435,6 @@ void Scheduler::processDelays() {
                 repeatRepatableTask(iter);
                 taskQueue.erase(taskQueue.begin() + i);
                 --i;
-                //TODO optymalise
             } else {
                 break;
             }
@@ -457,7 +455,6 @@ void Scheduler::processDelays() {
                                                            == actualTask->getId();
                                                 });
             taskQueue[0].execTime = nextTheSameTask->execTime - nextTheSameTask->repetableTask->getInterval();
-            //TODO fix bug! Problem with calculate good time. Now its add new tasks to close and thety repeat
         }
     }
 }
