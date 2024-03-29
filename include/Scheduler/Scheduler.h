@@ -16,6 +16,7 @@
 #include "TaskClassInterface.h"
 #include "TaskFunction.h"
 #include "TaskClass.h"
+#include "TaskBind.h"
 #include "Exception.h"
 
 using namespace std;
@@ -63,6 +64,9 @@ public:
     void addNewTask(chrono::microseconds interval, TaskClassInterface *clss, bool runOnThread = true,
                     bool canSkipped = true, bool isBlocking = false, chrono::microseconds endAfter = 0s);
 
+
+    void addNewTask(chrono::microseconds interval, TaskBind taskBind, bool runOnThread = true,
+                    bool canSkipped = true, bool isBlocking = false, chrono::microseconds endAfter = 0s);
 
     /**
      * Add new task executing addTask specific time

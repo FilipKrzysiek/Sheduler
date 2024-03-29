@@ -24,6 +24,13 @@ void Scheduler::addNewTask(chrono::microseconds interval, TaskClassInterface *cl
     taskId++;
 }
 
+void Scheduler::addNewTask(chrono::microseconds interval, TaskBind taskBind, bool runOnThread,
+                           bool canSkipped, bool isBlocking, chrono::microseconds endAfter) {
+    repeatableTaskList.emplace_back(new TaskRepeatable(new TaskBind( std::move(taskBind)), taskId, interval, isBlocking, runOnThread,
+                                                       canSkipped, endAfter));
+    taskId++;
+}
+
 Scheduler::~Scheduler() {
     waitToEndAllTasksOnThread();
 }
@@ -343,6 +350,7 @@ void Scheduler::executeStaticTimeTask(deque<TaskListItem>::iterator &actualtaskC
         }
     } else {
         mapTasksOnThread.emplace(task->getId(), std::async(std::launch::async, &TaskStaticTime::execute, task));
+        thread(&TaskStaticTime::execute, task);
     }
 }
 

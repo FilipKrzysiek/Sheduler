@@ -45,6 +45,21 @@ public:
     }
 };
 
+class ExampleClassNew {
+public:
+    void method() {
+        cout << currentDateTime() << "\t\t\t\t _ \t\t bind task: method" << endl;
+    }
+
+    void methodParams(int k, double d) {
+        cout << currentDateTime() << "\t\t\t\t _ \t\t bind task: method params: " << k << " " << d << endl;
+    }
+};
+
+void myFunctionNew() {
+    cout << currentDateTime() << "\t _ \t\t\t\t\t bind task: My function" << endl;
+}
+
 int main(int argc, char *argv[])
 {
     cout << "Start app" << endl;
@@ -60,6 +75,11 @@ int main(int argc, char *argv[])
     scheduler.addNewTask(2s, &ex, false, false);
     scheduler.addNewTask(2s, myFunctionSkippable, true, true);
     scheduler.addNewTaskCallingAt(chrono::system_clock::now() + 3s, myFunctionCallingAt, false, true);
+
+    ExampleClassNew exN;
+    scheduler.addNewTask(10s, TaskBind{myFunctionNew});
+    scheduler.addNewTask(10s, TaskBind{&ExampleClassNew::method, exN});
+    scheduler.addNewTask(10s, TaskBind{&ExampleClassNew::methodParams, exN, 51, 3.14});
 
     cout << "Start scheduler" << endl;
 

@@ -13,6 +13,8 @@ add_library(scheduler STATIC
         src/TaskFunction.cpp include/Scheduler/TaskFunction.h
         src/TaskRepeatable.cpp include/Scheduler/TaskRepeatable.h
         src/TaskStaticTime.cpp include/Scheduler/TaskStaticTime.h
+        include/Scheduler/TaskBind.cpp
+        include/Scheduler/TaskBind.h
 )
 
 
@@ -23,6 +25,8 @@ add_library(schedulerShared SHARED
         src/TaskFunction.cpp
         src/TaskRepeatable.cpp
         src/TaskStaticTime.cpp
+        include/Scheduler/TaskBind.cpp
+        include/Scheduler/TaskBind.h
 )
 
 target_link_libraries(scheduler PRIVATE Threads::Threads)
