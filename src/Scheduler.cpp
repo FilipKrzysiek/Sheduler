@@ -224,6 +224,7 @@ void Scheduler::run() {
     }
 
     waitToEndAllTasksOnThread();
+    flgWorking = false;
 }
 
 void Scheduler::start() {
@@ -237,14 +238,13 @@ void Scheduler::stop() {
         mainThread.join();
     }
 
-    waitToEndAllTasksOnThread();
     clenaup();
 }
 
 void Scheduler::wait() {
     if (mainThread.joinable()) {
         mainThread.join();
-        waitToEndAllTasksOnThread();
+
         clenaup();
     }
 }
