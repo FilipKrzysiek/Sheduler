@@ -202,11 +202,33 @@ public:
     void setAcceptedDelay(const chrono::microseconds &acceptedDelay);
 
     /**
-     * @brief Run sheduler, start executing tasks.
+     * Run sheduler, start executing tasks.
+     * Scheduler will be run on main thread.
      */
     void run();
 
-    //TODO stop
+    /**
+     * Run scheduler, start executing tasks.
+     * Scheduler will bu run on separated thread, no blocking this function.
+     */
+    void start();
+
+    /**
+     * Stop scheduler, new task will not be started. Wait for end started tasks.
+     * Works for scheduler started by run and start
+     */
+    void stop();
+
+    /**
+     * Wait untill scheduler end work (only for scheduler started on separated threas (run by start))
+     */
+    void wait();
+
+    /**
+     * Get information that scheduler is still working
+     * @return true - scheduker working, false - scheduler end work
+     */
+    bool isFlgWorking() const;
 
 private:
     struct TaskListItem {
@@ -235,9 +257,12 @@ private:
     deque<TaskListItem> taskQueue;
     map<unsigned int, future<void> > mapTasksOnThread;
 
+    thread mainThread;
+
     unsigned int taskId = 0;
     bool flgEndWorkTimeEnabled = false;
     bool flgEndWhenRepeatableEnd = true;
+    bool flgWorking = false;
 
 
     bool checkCorrectTime(unsigned short hour, unsigned short minute, unsigned short second);
@@ -273,6 +298,8 @@ private:
     void updateNow();
 
     void addTaskToQueue(const TaskListItem &task);
+
+    void clenaup();
 };
 
 #endif // SCHEDULER_H

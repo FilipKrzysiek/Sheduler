@@ -32,8 +32,13 @@ void Scheduler::addNewTask(chrono::microseconds interval, TaskBind taskBind, boo
 }
 
 Scheduler::~Scheduler() {
+    if (mainThread.joinable()) {
+        mainThread.join();
+    }
     waitToEndAllTasksOnThread();
 }
+
+//TODO add calling At bindable
 
 void Scheduler::addNewTaskCallingAt(system_clock_time timeToExecute, void (*execFun)(),
                                     bool recalcRepTasks, bool isBlocking) {
@@ -205,6 +210,7 @@ void Scheduler::setAcceptedDelay(const chrono::microseconds &acceptedDelay) {
 //-------------------------------------
 
 void Scheduler::run() {
+    flgWorking = true;
     updateNow();
     prepareRun();
     if (flgEndWorkTimeEnabled) {
@@ -220,8 +226,35 @@ void Scheduler::run() {
     waitToEndAllTasksOnThread();
 }
 
+void Scheduler::start() {
+    flgWorking = true;
+    mainThread = thread(&Scheduler::run, this);
+}
+
+void Scheduler::stop() {
+    flgWorking = false;
+    if (mainThread.joinable()) {
+        mainThread.join();
+    }
+
+    waitToEndAllTasksOnThread();
+    clenaup();
+}
+
+void Scheduler::wait() {
+    if (mainThread.joinable()) {
+        mainThread.join();
+        waitToEndAllTasksOnThread();
+        clenaup();
+    }
+}
+
+bool Scheduler::isFlgWorking() const {
+    return flgWorking;
+}
+
 bool Scheduler::mainLoopCondition() {
-    if (taskQueue.empty()) {
+    if (taskQueue.empty() || !flgWorking) {
         return false;
     }
 
@@ -305,6 +338,10 @@ void Scheduler::addTaskToQueue(const TaskListItem &task) {
         }
         taskQueue.push_back(task);
     }
+}
+
+void Scheduler::clenaup() {
+    taskQueue.clear();
 }
 
 void Scheduler::updateNow() {

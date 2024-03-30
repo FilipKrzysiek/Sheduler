@@ -35,7 +35,8 @@ target_include_directories(scheduler PRIVATE include/Scheduler)
 target_link_libraries(schedulerShared PRIVATE Threads::Threads)
 target_include_directories(schedulerShared PRIVATE include/Scheduler)
 
-add_subdirectory(example)
+add_subdirectory(example/onMainThread)
+add_subdirectory(example/onSeparatedThread)
 
 #add_executable(scheduler_example example/src/main.cpp)
 #target_link_libraries(scheduler_example PRIVATE scheduler)
