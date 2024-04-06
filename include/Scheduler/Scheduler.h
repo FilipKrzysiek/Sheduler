@@ -29,6 +29,9 @@ using system_clock_time = chrono::time_point<chrono::system_clock>;
 
 class Scheduler {
 public:
+     /**
+     * Create neber ending scheduler.
+     */
     Scheduler();
 
     /**
@@ -41,7 +44,7 @@ public:
 
     //TODO Documentation
     /**
-     * Adding new task to que.
+     * @brief Adding new task to que.
      * @param interval Interval of calling passed function.
      * @param execFun Address for function to call (execute).
      * @param runOnThread run this task on thread
@@ -53,7 +56,7 @@ public:
                     bool canSkipped = true, bool isBlocking = false, chrono::microseconds endAfter = 0s);
 
     /**
-     * Adding new task to que.
+     * @brief Adding new task to que.
      * @param interval Interval of calling passed function.
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
      * @param runOnThread run this task on thread
@@ -64,12 +67,20 @@ public:
     void addNewTask(chrono::microseconds interval, TaskClassInterface *clss, bool runOnThread = true,
                     bool canSkipped = true, bool isBlocking = false, chrono::microseconds endAfter = 0s);
 
-
-    void addNewTask(chrono::microseconds interval, TaskBind taskBind, bool runOnThread = true,
-                    bool canSkipped = true, bool isBlocking = false, chrono::microseconds endAfter = 0s);
+     /**
+      * @brief Adding new task to que.
+      * @param interval Interval of calling passed function.
+      * @param taskBind Object of task bind, this is wraper to call like `std::thread`.
+      * @param runOnThread run this task on thread
+      * @param canSkipped Call can be skipped when is delayed or when the same task still work.
+      * @param isBlocking if true all tasks run on thread must end before start this task.
+      * @param endAfter Ending after seconds. If 0 never ending.
+      */
+     void addNewTask(chrono::microseconds interval, TaskBind taskBind, bool runOnThread = true,
+                     bool canSkipped = true, bool isBlocking = false, chrono::microseconds endAfter = 0s);
 
     /**
-     * Add new task executing addTask specific time
+     * @brief Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param execFun Address for function to call (execute).
      * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
@@ -80,7 +91,7 @@ public:
                              bool isBlocking = false);
 
     /**
-     * Add new task executing addTask specific time
+     * @brief Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
      * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
@@ -91,7 +102,7 @@ public:
                              bool isBlocking = false);
 
     /**
-     * Add new task executing addTask specific time
+     * @brief Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param execFun Address for function to call (execute).
      * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
@@ -102,7 +113,7 @@ public:
                              bool isBlocking = false);
 
     /**
-     * Add new task executing addTask specific time
+     * @brief Add new task executing addTask specific time
      * @param timeToExecute Time when task must be executed (from passed date only was used hour, minute, and second)
      * @param clss Address to class which was expanded by TaskClassInterface where was method to calling.
      * @param recalcRepTasks (recalculateRepeatableTasksTime) this option works only when @blocking = true. This change behaviour of recalculating repeatable task execution time.
@@ -113,7 +124,7 @@ public:
                              bool isBlocking = false);
 
     /**
-     * Add new task executing addTask specific time
+     * @brief Add new task executing addTask specific time
      * @param hour Hour when task must be executed.
      * @param minute Minute when task must be executed.
      * @param second Second when task must be executed.
@@ -126,7 +137,7 @@ public:
                              bool recalcRepTasks = true, bool isBlocking = false);
 
     /**
-     * Add new task executing addTask specific time
+     * @brief Add new task executing addTask specific time
      * @param hour Hour when task must be executed.
      * @param minute Minute when task must be executed.
      * @param second Second when task must be executed.
